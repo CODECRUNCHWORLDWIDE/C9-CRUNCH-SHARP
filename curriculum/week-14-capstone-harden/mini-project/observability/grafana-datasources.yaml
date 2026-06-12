@@ -1,0 +1,42 @@
+# Grafana datasource provisioning for the Polyglot Workshop.
+# The derived fields and exemplar destinations are the connective tissue that
+# turns three separate backends into one correlated view:
+#   metric exemplar -> trace (Tempo) -> logs by TraceId (Loki).
+
+apiVersion: 1
+
+datasources:
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    url: http://tempo:3200
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: loki
+        filterByTraceID: true        # Loki query becomes: {service_name="..."} | TraceId="<id>"
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "1h"
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+
+  - name: Loki
+    type: loki
+    uid: loki
+    url: http://loki:3100
+    jsonData:
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '"TraceId":"(\w+)"'
+          url: '$${__value.raw}'
+          datasourceUid: tempo       # a TraceId in a log line becomes a link into Tempo
+
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    url: http://prometheus:9090
+    jsonData:
+      exemplarTraceIdDestinations:
+        - name: TraceID
+          datasourceUid: tempo       # an exemplar diamond links into Tempo

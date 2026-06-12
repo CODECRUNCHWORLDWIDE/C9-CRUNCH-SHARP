@@ -1,0 +1,47 @@
+# OpenTelemetry Collector pipeline for the Polyglot Workshop.
+# Receives OTLP from the app; fans traces -> Tempo, metrics -> Prometheus,
+# logs -> Loki. The redaction processor scrubs access_token before anything
+# reaches a backend (Lecture 1 §9, Lecture 3 §4).
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+  # Never let a bearer token reach Loki or Tempo, even if instrumentation records a URL.
+  redaction/safe:
+    allow_all_keys: true
+    blocked_values:
+      - "access_token=[^&\\s]+"
+      - "Bearer\\s+[A-Za-z0-9\\-_\\.]+"
+
+exporters:
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    enable_open_metrics: true   # REQUIRED so exemplars survive the export to Prometheus
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, redaction/safe]
+      exporters: [otlp/tempo]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [batch, redaction/safe]
+      exporters: [otlphttp/loki]

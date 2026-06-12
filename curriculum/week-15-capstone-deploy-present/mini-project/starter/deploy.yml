@@ -1,0 +1,121 @@
+# Polyglot Workshop — CD pipeline. Goes in .github/workflows/deploy.yml.
+# Four phases: build-test -> publish -> deploy. A red test blocks the image;
+# an unpublished image never deploys. OIDC to Azure (no long-lived secret).
+# See lecture-notes/02-github-actions-cd-to-azure-container-apps.md.
+#
+# Replace your-org/polyglot-workshop, the resource group, and the app name.
+
+name: cd
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DOTNET_VERSION: "9.0.x"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-
+      - name: Restore
+        run: dotnet restore
+      - name: Build (warnings are errors)
+        run: dotnet build --configuration Release --no-restore -warnaserror
+      # xUnit unit tests + WebApplicationFactory<T> + Testcontainers (PostgreSQL,
+      # Keycloak). ubuntu-latest already runs Docker; Testcontainers reaches it
+      # over the socket. https://dotnet.testcontainers.org/test_environment/continuous_integration/
+      - name: Test
+        run: dotnet test --configuration Release --no-build --logger "trx" --results-directory ./test-results
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./test-results
+
+  publish:
+    needs: build-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # REQUIRED for the OIDC handshake to Azure
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Azure login (OIDC, no secret)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy a new revision to Azure Container Apps
+        id: deploy
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          az containerapp update \
+            --name workshop-api \
+            --resource-group rg-workshop-capstone \
+            --image "$IMAGE" \
+            --revision-suffix "sha${GITHUB_SHA::8}"
+          URL=$(az containerapp show \
+            --name workshop-api --resource-group rg-workshop-capstone \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          echo "url=https://$URL" >> "$GITHUB_OUTPUT"
+      - name: Smoke test the new revision
+        run: |
+          URL="${{ steps.deploy.outputs.url }}"
+          for i in $(seq 1 10); do
+            if curl -fsS "$URL/health"; then echo "healthy"; exit 0; fi
+            sleep 5
+          done
+          echo "new revision never went healthy" && exit 1

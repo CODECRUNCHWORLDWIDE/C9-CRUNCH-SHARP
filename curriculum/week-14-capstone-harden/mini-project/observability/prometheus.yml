@@ -1,0 +1,13 @@
+# Prometheus scrape config for the Polyglot Workshop.
+# Scrapes the OpenTelemetry Collector's Prometheus exporter (which carries the
+# app's OTLP metrics, including exemplars). Run the server with
+# --enable-feature=exemplar-storage (set in docker-compose.yml).
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: otel-collector
+    static_configs:
+      - targets: ["otel-collector:8889"]   # the collector's prometheus exporter endpoint

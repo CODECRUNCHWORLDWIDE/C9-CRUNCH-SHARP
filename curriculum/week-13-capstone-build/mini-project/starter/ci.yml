@@ -1,0 +1,88 @@
+# .github/workflows/ci.yml — the merge gate for the integration baseline.
+#
+# Restores, builds all three clients against the one contract, and runs the
+# integration suite. Testcontainers starts PostgreSQL and Keycloak INSIDE the
+# runner — Docker is preinstalled on ubuntu-latest — so the same real test that
+# ran on your laptop runs here with zero CI-specific database config.
+#
+# SYLLABUS milestone: integration tests green in CI. A baseline green locally
+# and red here is red.
+#
+# Citations:
+#   Actions syntax:        https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+#   setup-dotnet:          https://github.com/actions/setup-dotnet
+#   Testcontainers on CI:  https://dotnet.testcontainers.org/
+#   NuGet caching:         https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows
+
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      # Cache the NuGet package downloads keyed on the lock files, so the run
+      # spends its time on the integration test, not on restore.
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore Workshop.sln
+
+      # Backend + Blazor admin. Both must build against the generated contract.
+      - name: Build (backend + Blazor)
+        run: dotnet build Workshop.sln -c Release --no-restore
+
+      # The MAUI head is built explicitly: the solution build does not
+      # necessarily build every MAUI target framework, and a contract change
+      # that breaks the phone client must fail CI, not "Friday".
+      - name: Install MAUI workload
+        run: dotnet workload install maui-android
+
+      - name: Build MAUI (android head)
+        run: >
+          dotnet build src/Workshop.Maui/Workshop.Maui.csproj
+          -c Release -f net9.0-android
+
+      # The load-bearing step: integration tests over Testcontainers Postgres +
+      # Keycloak. No `services:` block — the test starts its own containers.
+      - name: Integration tests
+        run: >
+          dotnet test tests/Workshop.IntegrationTests
+          -c Release --no-build
+          --logger "trx;LogFileName=integration.trx"
+          --results-directory ./test-results
+
+      - name: Unit tests
+        run: >
+          dotnet test tests/Workshop.UnitTests
+          -c Release --no-build
+          --logger "trx;LogFileName=unit.trx"
+          --results-directory ./test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./test-results
