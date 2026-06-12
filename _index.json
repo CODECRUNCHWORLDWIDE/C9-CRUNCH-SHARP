@@ -1,0 +1,525 @@
+{
+  "repo": "C9-CRUNCH-SHARP",
+  "files": [
+    {
+      "path": "CODE_OF_CONDUCT.md",
+      "title": "Contributor Covenant Code of Conduct"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "title": "Contributing to Crunch Sharp (C# / .NET)"
+    },
+    {
+      "path": "README.md",
+      "title": "C9 \u00b7 Crunch Sharp \u2014 C# & .NET Engineering"
+    },
+    {
+      "path": "assets/branding/BRAND.md",
+      "title": "C9 \u00b7 Crunch Sharp \u2014 Brand Guide"
+    },
+    {
+      "path": "community/CHARTER.md",
+      "title": "C9 \u00b7 Crunch Sharp \u2014 Charter"
+    },
+    {
+      "path": "curriculum/SYLLABUS.md",
+      "title": "C9 \u00b7 Crunch Sharp \u2014 Syllabus"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/README.md",
+      "title": "Week 1 \u2014 The C# Language Tour"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/challenges/README.md",
+      "title": "Week 1 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/challenges/challenge-01-fluent-builder.md",
+      "title": "Challenge 1 \u2014 Fluent Builder with Records and `with`"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/exercises/README.md",
+      "title": "Week 1 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/exercises/exercise-01-hello-dotnet.md",
+      "title": "Exercise 1 \u2014 Hello, .NET"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/homework.md",
+      "title": "Week 1 Homework"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/lecture-notes/01-the-dotnet-stack-and-toolchain.md",
+      "title": "Lecture 1 \u2014 The .NET Stack and the Toolchain"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/lecture-notes/02-modern-csharp-essentials.md",
+      "title": "Lecture 2 \u2014 Modern C# Essentials"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/mini-project/README.md",
+      "title": "Mini-Project \u2014 Ledger CLI"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/quiz.md",
+      "title": "Week 1 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-01-csharp-language-tour/resources.md",
+      "title": "Week 1 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/README.md",
+      "title": "Week 2 \u2014 ASP.NET Core Minimal APIs"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/challenges/README.md",
+      "title": "Week 2 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/challenges/challenge-01-the-five-endpoint-todo-api.md",
+      "title": "Challenge 1 \u2014 The Five-Endpoint Todo API"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/exercises/README.md",
+      "title": "Week 2 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/exercises/exercise-01-hello-api.md",
+      "title": "Exercise 1 \u2014 Hello, API"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/homework.md",
+      "title": "Week 2 Homework"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/lecture-notes/01-minimal-apis-the-defaults.md",
+      "title": "Lecture 1 \u2014 Minimal APIs: The Defaults"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/lecture-notes/02-dependency-injection-and-services.md",
+      "title": "Lecture 2 \u2014 Dependency Injection and Services"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/mini-project/README.md",
+      "title": "Mini-Project \u2014 Ledger REST"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/quiz.md",
+      "title": "Week 2 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-02-aspnet-core-minimal-apis/resources.md",
+      "title": "Week 2 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/README.md",
+      "title": "Week 3 \u2014 Entity Framework Core"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/challenges/README.md",
+      "title": "Week 3 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/challenges/challenge-01-complex-query-performance.md",
+      "title": "Challenge 1 \u2014 Complex query performance"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/exercises/README.md",
+      "title": "Week 3 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/exercises/exercise-01-first-context.md",
+      "title": "Exercise 1 \u2014 Your first context"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/homework.md",
+      "title": "Week 3 Homework"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/lecture-notes/01-dbcontext-and-models.md",
+      "title": "Lecture 1 \u2014 DbContext and Models"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/lecture-notes/02-migrations-and-queries.md",
+      "title": "Lecture 2 \u2014 Migrations and Queries"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/mini-project/README.md",
+      "title": "Mini-Project \u2014 Ledger Persistence"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/quiz.md",
+      "title": "Week 3 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-03-entity-framework-core/resources.md",
+      "title": "Week 3 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/README.md",
+      "title": "Week 4 \u2014 Async, Channels, and Cancellation"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/challenges/README.md",
+      "title": "Week 4 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/challenges/challenge-01-build-a-rate-limited-fetcher.md",
+      "title": "Challenge 1 \u2014 Build a rate-limited fetcher"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/exercises/README.md",
+      "title": "Week 4 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/homework.md",
+      "title": "Week 4 Homework"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/lecture-notes/01-tasks-async-await-and-the-state-machine.md",
+      "title": "Lecture 1 \u2014 Tasks, async/await, and the State Machine"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/lecture-notes/02-channels-and-cancellation.md",
+      "title": "Lecture 2 \u2014 Channels and Cancellation"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/mini-project/README.md",
+      "title": "Mini-Project \u2014 Typed Async Crawler"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/quiz.md",
+      "title": "Week 4 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-04-async-channels-cancellation/resources.md",
+      "title": "Week 4 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/README.md",
+      "title": "Week 5 \u2014 LINQ and Functional Patterns"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/challenges/README.md",
+      "title": "Week 5 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/challenges/challenge-01-implement-your-own-where-select.md",
+      "title": "Challenge 1 \u2014 Implement your own `Where` / `Select` / `SelectMany`"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/exercises/README.md",
+      "title": "Week 5 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/homework.md",
+      "title": "Week 5 Homework"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/lecture-notes/01-linq-fundamentals-and-deferred-execution.md",
+      "title": "Lecture 1 \u2014 LINQ Fundamentals and Deferred Execution"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/lecture-notes/02-functional-patterns-records-pattern-matching.md",
+      "title": "Lecture 2 \u2014 Functional Patterns, Records, and Pattern Matching"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/mini-project/README.md",
+      "title": "Mini-Project \u2014 Procedural-to-Pipeline Refactor"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/quiz.md",
+      "title": "Week 5 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-05-linq-and-functional/resources.md",
+      "title": "Week 5 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/README.md",
+      "title": "Week 6 \u2014 ASP.NET Core Authentication and Authorization"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/challenges/README.md",
+      "title": "Week 6 \u2014 Challenges"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/challenges/challenge-01-multi-tenant-authorization.md",
+      "title": "Challenge 1 \u2014 Multi-Tenant Authorization"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/exercises/README.md",
+      "title": "Week 6 \u2014 Exercises"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/homework.md",
+      "title": "Week 6 Homework"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/lecture-notes/01-cookies-jwt-and-the-identity-system.md",
+      "title": "Lecture 1 \u2014 Cookies, JWT, and the Identity System"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/lecture-notes/02-policy-based-authorization-and-claims.md",
+      "title": "Lecture 2 \u2014 Policy-Based Authorization and Claims"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/mini-project/README.md",
+      "title": "Mini-Project \u2014 Sharp Notes Auth"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/quiz.md",
+      "title": "Week 6 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-06-auth-and-identity/resources.md",
+      "title": "Week 6 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/README.md",
+      "title": "Week 7 \u2014 .NET Performance Engineering: BenchmarkDotNet, Spans, and Allocation Reduction"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/challenges/challenge-01-rewrite-a-method-to-be-zero-alloc.md",
+      "title": "Challenge 1 \u2014 Rewrite an allocation-heavy method to be zero-allocation"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/challenges/challenge-02-design-and-bench-a-custom-collection.md",
+      "title": "Challenge 2 \u2014 Design and bench a custom collection: `StackList<T>`"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/exercises/SOLUTIONS.md",
+      "title": "Week 7 \u2014 Exercise Solutions"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/homework.md",
+      "title": "Week 7 Homework"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/lecture-notes/01-measuring-performance-with-benchmarkdotnet.md",
+      "title": "Lecture 1 \u2014 Measuring Performance with BenchmarkDotNet"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/lecture-notes/02-spans-and-stack-only-buffers.md",
+      "title": "Lecture 2 \u2014 `Span<T>` and Stack-Only Buffers"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/lecture-notes/03-allocation-reduction-arraypool-valuetask.md",
+      "title": "Lecture 3 \u2014 Allocation Reduction: `ArrayPool<T>`, `ValueTask<T>`, and Struct vs Class"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/mini-project/README.md",
+      "title": "Mini-Project \u2014 Sharp Bench: profile a slow LINQ pipeline and make it 10\u00d7 faster"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/quiz.md",
+      "title": "Week 7 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-07-performance-benchmarkdotnet-spans/resources.md",
+      "title": "Week 7 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/README.md",
+      "title": "Week 8 \u2014 Async/Await and Channels in Production: ConfigureAwait, IAsyncEnumerable, Backpressure, and Deadlocks"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/challenges/challenge-01-diagnose-the-deadlock.md",
+      "title": "Challenge 1 \u2014 Diagnose the four canonical async deadlocks"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/challenges/challenge-02-threadpool-starvation-from-counters.md",
+      "title": "Challenge 2 \u2014 Diagnose ThreadPool starvation from `dotnet-counters`"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/exercises/SOLUTIONS.md",
+      "title": "Week 8 \u2014 Exercise Solutions (annotated)"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/homework.md",
+      "title": "Week 8 \u2014 Homework"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/lecture-notes/01-await-synchronizationcontext-configureawait.md",
+      "title": "Lecture 1 \u2014 The Await Lowering, SynchronizationContext, and ConfigureAwait"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/lecture-notes/02-iasyncenumerable-and-await-foreach.md",
+      "title": "Lecture 2 \u2014 IAsyncEnumerable, await foreach, and Streaming-Async"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/lecture-notes/03-channels-backpressure-parallel-foreachasync.md",
+      "title": "Lecture 3 \u2014 Channels in Production, Backpressure, Parallel.ForEachAsync, and ThreadPool Starvation"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/mini-project/README.md",
+      "title": "Mini-Project \u2014 Sharp Pipe: an instrumented channel pipeline"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/quiz.md",
+      "title": "Week 8 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-08-async-channels-in-production/resources.md",
+      "title": "Week 8 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/README.md",
+      "title": "Week 9 \u2014 gRPC and Protocol Buffers in .NET 8: Proto3, the Four Call Types, Interceptors, Deadlines, and Cross-Language Clients"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/challenges/challenge-01-cross-language-client.md",
+      "title": "Challenge 1 \u2014 Cross-Language Client: Python Calls the C# NumberService"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/challenges/challenge-02-schema-evolution.md",
+      "title": "Challenge 2 \u2014 Schema Evolution: v1 Clients Against v2 Servers"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/exercises/SOLUTIONS.md",
+      "title": "Exercise Solutions \u2014 Week 9"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/homework.md",
+      "title": "Week 9 \u2014 Homework"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/lecture-notes/01-protobuf3-and-the-wire-format.md",
+      "title": "Lecture 1 \u2014 Protocol Buffers 3: the Language, the Wire Format, and the Generated C# Code"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/lecture-notes/02-grpc-call-types-and-the-dotnet-stack.md",
+      "title": "Lecture 2 \u2014 gRPC over HTTP/2: the Four Call Types, the C# Server, the C# Client, and the Cross-Language Story"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/lecture-notes/03-deadlines-errors-interceptors-tls.md",
+      "title": "Lecture 3 \u2014 Deadlines, Cancellation, Error Mapping, Interceptors, and TLS"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/mini-project/README.md",
+      "title": "Mini-Project \u2014 Crunch Counter: a Distributed Counter Service with C# and Python Clients"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/quiz.md",
+      "title": "Week 9 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-09-grpc-and-protobuf/resources.md",
+      "title": "Week 9 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/README.md",
+      "title": "Week 10 \u2014 Entity Framework Core 8 in Production: Migrations, the Change Tracker, Loading Strategies, the N+1 Problem, and Reading the Generated SQL"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/challenges/challenge-01-cartesian-explosion-and-split.md",
+      "title": "Challenge 1 \u2014 Cartesian Explosion and the `AsSplitQuery` Cure"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/challenges/challenge-02-compiled-query-benchmark.md",
+      "title": "Challenge 2 \u2014 Compile a Hot Query and Measure the Saving"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/exercises/SOLUTIONS.md",
+      "title": "Exercise Solutions \u2014 Week 10"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/homework.md",
+      "title": "Week 10 \u2014 Homework"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/lecture-notes/01-dbcontext-migrations-and-the-change-tracker.md",
+      "title": "Lecture 1 \u2014 `DbContext`, the Migrations Workflow, and the Change Tracker"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/lecture-notes/02-loading-strategies-and-the-n-plus-one-problem.md",
+      "title": "Lecture 2 \u2014 Loading Strategies, the N+1 Problem, and Cartesian Explosion"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/lecture-notes/03-raw-sql-converters-compiled-queries-observability.md",
+      "title": "Lecture 3 \u2014 Raw SQL, Value Converters, Owned Types, Compiled Queries, and `dotnet-counters`"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/mini-project/README.md",
+      "title": "Mini-Project \u2014 Crunch Catalog: a Production-Shaped Product Catalog API with EF Core 8"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/quiz.md",
+      "title": "Week 10 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-10-entity-framework-core-deep/resources.md",
+      "title": "Week 10 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/README.md",
+      "title": "Week 11 \u2014 ASP.NET Core SignalR for Real-Time Web: Hubs, Transports, Groups, JWT on the WebSocket Upgrade, Redis Backplane Scale-Out, MessagePack, and Reconnection"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/challenges/challenge-01-redis-backplane-and-messagepack.md",
+      "title": "Challenge 1 \u2014 Redis Backplane plus MessagePack: Two-Instance Cross-Server Broadcast"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/challenges/challenge-02-resilient-reconnect-with-replay.md",
+      "title": "Challenge 2 \u2014 Resilient Reconnect with Idempotent Replay"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/exercises/SOLUTIONS.md",
+      "title": "Week 11 \u2014 Exercise Solutions and Annotations"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/homework.md",
+      "title": "Week 11 \u2014 Homework"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/lecture-notes/01-hubs-transports-and-the-negotiate-handshake.md",
+      "title": "Lecture 1 \u2014 Hubs, Transports, and the Negotiate Handshake"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/lecture-notes/02-groups-jwt-on-the-upgrade-and-strongly-typed-hubs.md",
+      "title": "Lecture 2 \u2014 Groups (Rooms), JWT on the WebSocket Upgrade, `IUserIdProvider`, and Strongly-Typed Hubs"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/lecture-notes/03-scale-out-messagepack-reconnection-and-streaming.md",
+      "title": "Lecture 3 \u2014 Scale-Out with a Redis Backplane, the MessagePack Protocol, Reconnection State, and Streaming with `IAsyncEnumerable`"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/mini-project/README.md",
+      "title": "Mini-Project \u2014 Crunch Chat: Multi-Instance Real-Time Chat with JWT Auth, Redis Backplane, MessagePack, and Resilient Reconnect"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/quiz.md",
+      "title": "Week 11 \u2014 Quiz"
+    },
+    {
+      "path": "curriculum/week-11-signalr-and-realtime/resources.md",
+      "title": "Week 11 \u2014 Resources"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/README.md",
+      "title": "Week 12 \u2014 Production-Grade Service Integration: Composing ASP.NET Core Minimal APIs, EF Core, gRPC, SignalR, JWT Identity, Serilog, and OpenTelemetry into a Single Deployable"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/exercises/SOLUTIONS.md",
+      "title": "Week 12 Exercise Solutions"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/lecture-notes/01-composition-and-three-protocol-surfaces.md",
+      "title": "Lecture 1 \u2014 Composition and the Three Protocol Surfaces: REST, gRPC, SignalR in One Host"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/lecture-notes/02-serilog-opentelemetry-and-the-single-trace.md",
+      "title": "Lecture 2 \u2014 Serilog, OpenTelemetry, and the Single Trace Through Three Protocols"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/lecture-notes/03-integration-tests-with-webapplicationfactory-and-testcontainers.md",
+      "title": "Lecture 3 \u2014 Integration Tests with `WebApplicationFactory<Program>` and Testcontainers"
+    },
+    {
+      "path": "curriculum/week-12-production-grade-service-integration/resources.md",
+      "title": "Week 12 Resources \u2014 Production-Grade Service Integration"
+    }
+  ]
+}
