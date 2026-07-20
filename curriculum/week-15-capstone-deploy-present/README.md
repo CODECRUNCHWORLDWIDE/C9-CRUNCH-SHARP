@@ -1,0 +1,109 @@
+# Week 15 — Capstone Deploy and Present: Taking the Polyglot Workshop from a Green Build to a Live URL with One Push, a Runbook, and a Defense
+
+Welcome to **C9 · Crunch Sharp**, Week 15 — the final week. Week 13 built the Polyglot Workshop as a vertical slice: an ASP.NET Core 9 backend (`Workshop.Api`), a .NET MAUI client (`Workshop.Mobile`), and a Blazor admin (`Workshop.Admin`), all three compiling against the single typed gRPC contract in `Workshop.Contracts` (`workshop.v1`), with integration tests green in CI against a Testcontainers PostgreSQL and Keycloak. Week 14 hardened it: the OWASP API surface threat-modeled, auth covered by integration tests, MediatR introduced where it earned its keep, and logs, metrics, and traces flowing through Serilog and OpenTelemetry. This week we do the last thing a real system needs and the thing learner projects almost always skip: **we deploy it, and we present it.** The same repo — `PolyglotWorkshop`, with `Workshop.Api`, `Workshop.Mobile`, `Workshop.Admin`, `Workshop.Contracts`, and `Workshop.IntegrationTests` — goes to a public URL behind a CI pipeline, gets a `RUNBOOK.md`, and gets defended. We do not invent a new project. We ship the one we built.
+
+The first thing to internalize is that **deploy is a feature, and the pipeline is part of the product**. A service that only runs on the author's laptop is not a service; it is a demo. The unit of delivery this week is not "the code compiles" — it is "one push to `main` reaches a live URL with the tests green." The mechanism is a multi-stage Dockerfile that produces a small, hardened runtime image, a GitHub Actions workflow that builds, tests against ephemeral containers, publishes the image to a registry, and deploys to **Azure Container Apps** on its free tier — the primary target — or to **Fly.io** or any Linux container host as a secondary. Every one of those steps is code, lives in the repo, and is reviewed like code. The canonical citation is Microsoft's containerize-a-.NET-app guide at <https://learn.microsoft.com/en-us/dotnet/core/docker/build-container>.
+
+The second thing to internalize is that **the runtime image is part of your threat surface, and smaller is safer**. A `dotnet new` image built naively ships the SDK, build tooling, and source — hundreds of megabytes of attack surface that never runs in production. A multi-stage build separates the *build* stage (`mcr.microsoft.com/dotnet/sdk:9.0`) from the *runtime* stage (`mcr.microsoft.com/dotnet/aspnet:9.0`, or the chiseled/`-noble-chiseled` variant for a distroless-style image), copying only the published output forward. For a CLI companion or a latency-sensitive worker, **Native AOT** publish produces a self-contained native binary on `runtime-deps` with no JIT and a sub-100ms cold start. Lecture 1 builds both. The citation is the .NET container images reference at <https://github.com/dotnet/dotnet-docker> and the Native AOT deployment docs at <https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/>.
+
+The third thing to internalize is that **CI must hold no long-lived cloud credentials**. The old pattern — a service-principal client secret pasted into a GitHub Actions secret — is a standing liability: it does not expire on its own, it leaks in logs, and it grants whoever finds it your whole subscription. The modern pattern is **GitHub OIDC federation**: the workflow requests a short-lived token from GitHub's identity provider, Azure (or AWS, or GCP) trusts that issuer for a specific repo and branch, and `azure/login` exchanges it for a credential that lives for the length of the job. No secret is stored; nothing to rotate; nothing to leak. Lecture 2 wires it. The citation is GitHub's OIDC guide at <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect> and Azure's federated-credentials doc at <https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation>.
+
+The fourth thing to internalize is that **a database migration is a deploy step with its own failure mode**. EF Core migrations applied automatically at app startup race when two revisions boot at once and roll badly when a migration is destructive. The disciplined pattern runs migrations as a *separate, gated step* — a one-shot job or an `efbundle` invocation against the production connection string — *before* the new revision takes traffic, and keeps every migration additive so a rollback to the previous image still finds a schema it understands. Lecture 3 and the runbook cover the "expand, then contract" discipline. The citation is the EF Core migrations-in-production guide at <https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying>.
+
+The fifth thing to internalize is that **rollback is a feature you build before you need it, not a heroic act you improvise at 3am**. Azure Container Apps models every deploy as a **revision**; traffic is split across revisions by weight, so a rollback is a one-command traffic reweight back to the last-known-good revision — no rebuild, no redeploy. Fly.io models the same idea as releases with `flyctl releases` and rolling/`bluegreen` strategies. Health and readiness probes gate whether a new revision ever receives traffic at all. Lecture 3 drills the rollback; challenge-02 proves zero dropped requests across a rollout. The citation is the Container Apps revisions doc at <https://learn.microsoft.com/en-us/azure/container-apps/revisions> and the Fly.io deploy doc at <https://fly.io/docs/launch/deploy/>.
+
+The sixth thing to internalize is that **the runbook is the deliverable your future self thanks you for**. `RUNBOOK.md` is not documentation theater. It answers, in five concrete sections, the questions you will actually be asked at 3am: how do I deploy, how do I roll back, where do the logs live, how do I rotate the OIDC client secret, and what do I do if the database fills up. A runbook that cannot be followed by someone who did not write the system is not a runbook. Lecture 3 specifies its shape; the capstone defense grades it. The citation is the Google SRE workbook's chapter on writing runbooks (operational playbooks) at <https://sre.google/workbook/playbooks/>.
+
+The seventh thing to internalize is that **this is the end of C9, and the capstone is 35% of the grade that no other component can carry**. The mini-project this week is not another mini-project — it is the **capstone defense**: a live demo of the deployed system, the portfolio packaging, the runbook, and a Q&A where graders probe the contract, the tests, the pipeline, and the operations. Visual polish earns nothing. Contract integrity, test coverage of meaningful paths, deploy-pipeline quality, and the runbook earn everything. The framing is the C9 SYLLABUS assessment matrix; the defense brief is `mini-project/README.md`.
+
+By the end of this week you will be the engineer who can take a .NET service from `dotnet new` to a live URL with one push, who never stores a long-lived cloud credential in CI, who can roll a bad deploy back in one command, and who leaves behind a runbook the next person can actually use. That is the difference between someone who writes services and someone who *operates* them. C9 ends here; you finish it operating.
+
+## Learning objectives
+
+By the end of this week, you will be able to:
+
+- **Author** a multi-stage Dockerfile for `Workshop.Api` that separates the SDK build stage from a minimal `aspnet:9.0` (or chiseled) runtime stage, runs as a non-root user, and produces an image you can `docker run` locally. Cite <https://learn.microsoft.com/en-us/dotnet/core/docker/build-container>.
+- **Publish** a Native AOT companion (the analytics export CLI) on `runtime-deps`, measure its cold start and image size against the JIT build, and state what AOT gives, costs, and forbids. Cite <https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/>.
+- **Build** a GitHub Actions workflow that checks out, restores, builds, runs `Workshop.IntegrationTests` against Testcontainers in CI, publishes the image to a registry, and deploys. Cite <https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-net>.
+- **Federate** CI to Azure with GitHub OIDC so no long-lived credential is stored, and reason about why subject-claim scoping to a branch matters. Cite <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect>.
+- **Deploy** `Workshop.Api` to Azure Container Apps free tier via `az containerapp` and the `azure/container-apps-deploy-action`, with managed PostgreSQL and a Keycloak container, and reach it at a public HTTPS URL. Cite <https://learn.microsoft.com/en-us/azure/container-apps/get-started>.
+- **Configure** health (`/healthz`) and readiness (`/readyz`) probes so a broken revision never takes traffic, and run the database migration as a gated step rather than at startup. Cite <https://learn.microsoft.com/en-us/azure/container-apps/health-probes> and <https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying>.
+- **Roll back** a bad deploy by reweighting Container Apps revision traffic to the last-known-good revision in one command, and prove no requests drop during a rollout. Cite <https://learn.microsoft.com/en-us/azure/container-apps/revisions>.
+- **Deploy** the same image to Fly.io as a secondary target with `flyctl deploy` and a `fly.toml`, and compare the two operational models. Cite <https://fly.io/docs/launch/deploy/>.
+- **Sideload** the `Workshop.Mobile` Android APK onto a device and publish `Workshop.Admin` to its public URL so all three clients hit the same deployed contract. Cite <https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/publish-cli>.
+- **Write** a `RUNBOOK.md` covering deploy, rollback, log location, OIDC-secret rotation, and database-full response, and reason about cost on the free tier. Cite <https://sre.google/workbook/playbooks/>.
+- **Defend** the capstone: run the live demo, package the portfolio, and answer Q&A on contract integrity, test coverage, pipeline quality, and the runbook. Cite the C9 SYLLABUS assessment matrix.
+- **Cite** Microsoft Learn (Azure Container Apps, containerize-a-.NET-app, EF Core migrations, MAUI publish), docs.docker.com, docs.github.com/actions, fly.io/docs, opentelemetry.io, and the `dotnet/dotnet-docker` repository for each technique covered.
+
+## Prerequisites
+
+- **Weeks 2–14 of C9 complete, and Weeks 13 and 14 in particular.** This week deploys the same `PolyglotWorkshop` repo that Week 13 built and Week 14 hardened. If your Milestone 1 (integration baseline) and Milestone 2 (production polish) are not done, finish them first — there is nothing to deploy otherwise.
+- **A working `dotnet --version` of `9.0.x`.** This week targets .NET 9 / C# 13 / EF Core 9, consistent with the whole capstone arc.
+- **Docker.** Required to build the multi-stage image locally, to run the integration tests (Testcontainers), and to test the image before the pipeline does. The daemon must be running before `docker build` or `dotnet test`.
+- **A free Azure account (primary) or a Fly.io account (secondary).** Azure offers a free tier for Container Apps and a free PostgreSQL allowance for new accounts; Fly.io offers a free allowance for small apps. Either works for the capstone; the lectures lead with Azure and show Fly.io alongside.
+- **The `az` CLI (`az version` ≥ 2.60) with the `containerapp` extension, or `flyctl`.** Install `az` from <https://learn.microsoft.com/en-us/cli/azure/install-azure-cli> and add the extension with `az extension add --name containerapp`; install `flyctl` from <https://fly.io/docs/flyctl/install/>.
+- **An Android device with developer mode / "install unknown apps" enabled, or an Android emulator.** Required to sideload the `Workshop.Mobile` APK for the demo.
+- **A public GitHub account** for the Actions pipeline and the portfolio profile.
+
+## Topics covered
+
+- **Multi-stage Dockerfiles.** The `sdk:9.0` → `aspnet:9.0` two-stage pattern; layer caching by copying `.csproj` and restoring before copying source; the chiseled/`-noble-chiseled` runtime variant; running as a non-root user; `.dockerignore`; image-size measurement.
+- **Native AOT publish.** `PublishAot=true`, the `runtime-deps` base, what AOT gives (cold start, size, no JIT), what it costs (build time, cross-compilation), and what it forbids (unbounded reflection, some serializers, dynamic assembly loading). Where AOT fits the capstone (the analytics CLI) and where it does not (the EF Core API host).
+- **GitHub Actions pipelines.** `actions/checkout@v4`, `actions/setup-dotnet@v4`, `dotnet restore/build/test`, Testcontainers in the runner, `docker/build-push-action@v6`, registry login, the `build → test → publish → deploy` job graph, environments and required reviewers.
+- **GitHub OIDC to Azure.** Federated identity credentials on a user-assigned managed identity or app registration, the `id-token: write` permission, `azure/login@v2` with `client-id`/`tenant-id`/`subscription-id` and no secret, subject-claim scoping.
+- **Azure Container Apps.** `az containerapp up`/`create`/`update`, ingress and the public FQDN, secrets and environment variables, scale-to-zero on the free tier, managed PostgreSQL Flexible Server, a Keycloak sidecar/container, revisions and traffic weights.
+- **Fly.io (secondary).** `fly launch`, `fly.toml`, `flyctl deploy`, releases and rollback, Fly Postgres, the operational comparison with Container Apps.
+- **Health and readiness probes.** `MapHealthChecks("/healthz")` (liveness) vs `/readyz` (readiness, gated on DB + Keycloak reachability), the probe configuration on the platform, why a failing readiness probe keeps a revision from taking traffic.
+- **Database migration on deploy.** `dotnet ef migrations bundle` / `efbundle`, the gated migration job, the expand-then-contract pattern for backward-compatible schema changes, why startup migration races.
+- **Rollback and rollout.** Revision-based rollback (traffic reweight), blue/green and rolling strategies, the load-generator proof of zero dropped requests, cost on the free tier.
+- **The runbook and on-call.** The five-section `RUNBOOK.md`, severity levels, the first five minutes of an incident, where logs and traces live (Log Analytics / `az containerapp logs`, the OTLP backend), secret rotation, the database-full response.
+- **The capstone defense.** The live demo choreography, the portfolio packaging, the system-design dossier (career pack), the grading rubric, and the Q&A.
+
+## Weekly schedule
+
+The schedule adds up to approximately **34 hours**, weighted toward the capstone defense at the end of the week. Treat it as a target, not a contract. The deploy material punishes skimming — a misread probe path or a missing OIDC subject claim costs an hour of pipeline-staring — so read the YAML, do not glance at it.
+
+| Day       | Focus                                                                  | Lectures | Exercises | Challenges | Quiz/Read | Capstone | Self-Study | Daily Total |
+|-----------|------------------------------------------------------------------------|---------:|----------:|-----------:|----------:|---------:|-----------:|------------:|
+| Monday    | Multi-stage Dockerfiles, image hardening, Native AOT companion          |   2h     |   1.5h    |     0h     |   0.5h    |   0h     |    0.5h    |    4.5h     |
+| Tuesday   | GitHub Actions: build, test in CI, publish; OIDC to Azure               |   2h     |   1.5h    |     0h     |   0.5h    |   0h     |    0.5h    |    4.5h     |
+| Wednesday | Deploy to Container Apps, probes, migration-on-deploy, rollback         |   2h     |   1h      |     0h     |   0.5h    |   1h     |    0.5h    |    5h       |
+| Thursday  | Challenges — image-size/AOT, zero-downtime rollout drill                |   0.5h   |   0h      |     2h     |   0.5h    |   1.5h   |    0.5h    |    5h       |
+| Friday    | Capstone integration — deploy all three clients, sideload, write RUNBOOK |   0h     |   0h      |     1h     |   0.5h    |   3.5h   |    0.5h    |    5.5h     |
+| Saturday  | Capstone polish, record the demo, portfolio packaging                   |   0h     |   0h      |     0h     |   0h      |   4h     |    0h      |    4h       |
+| Sunday    | Quiz, defense dry-run, Q&A prep, system-design dossier review           |   0h     |   0h      |     0h     |   1h      |   3.5h   |    1h      |    5.5h     |
+| **Total** |                                                                        | **6.5h** | **5h**    | **3h**     | **4h**    | **13.5h**| **4h**     | **34h**     |
+
+## How to navigate this week
+
+| File | What's inside |
+|------|---------------|
+| [README.md](./README.md) | This overview (you are here) |
+| [resources.md](./resources.md) | Azure Container Apps, containerize-a-.NET-app, EF Core migrations, MAUI publish, Docker, GitHub Actions, Fly.io, OpenTelemetry, and `dotnet/dotnet-docker` references |
+| [lecture-notes/01-multi-stage-dockerfiles-and-native-aot.md](./lecture-notes/01-multi-stage-dockerfiles-and-native-aot.md) | The `sdk:9.0`→`aspnet:9.0` multi-stage build, image hardening and size, the chiseled runtime, Native AOT publish — what it gives, costs, and forbids |
+| [lecture-notes/02-github-actions-build-test-publish-deploy.md](./lecture-notes/02-github-actions-build-test-publish-deploy.md) | The build/test/publish/deploy workflow, Testcontainers in CI, GitHub OIDC to Azure with no long-lived secret, image push to a registry, the deploy job |
+| [lecture-notes/03-runbook-on-call-and-the-live-demo.md](./lecture-notes/03-runbook-on-call-and-the-live-demo.md) | Health/readiness probes, migration-on-deploy, revision rollback, the `RUNBOOK.md` spec, on-call basics, secret rotation, and the live-demo choreography |
+| [exercises/exercise-01-multi-stage-dockerfile.dockerfile](./exercises/exercise-01-multi-stage-dockerfile.dockerfile) | Write the multi-stage Dockerfile for `Workshop.Api`, run it locally, hit `/healthz`, measure the image size |
+| [exercises/exercise-02-native-aot-cli.dockerfile](./exercises/exercise-02-native-aot-cli.dockerfile) | Publish the analytics-export CLI as Native AOT on `runtime-deps`; measure cold start and size against the JIT build |
+| [exercises/exercise-03-actions-build-test.yml](./exercises/exercise-03-actions-build-test.yml) | The GitHub Actions build-and-test workflow running `Workshop.IntegrationTests` against Testcontainers in the runner |
+| [exercises/exercise-04-actions-deploy-oidc.yml](./exercises/exercise-04-actions-deploy-oidc.yml) | The deploy job: GitHub OIDC to Azure, push to the registry, `az containerapp update`, gated migration |
+| [exercises/SOLUTIONS.md](./exercises/SOLUTIONS.md) | Worked solutions for the four exercises with verification output and common stumbles |
+| [challenges/challenge-01-cut-the-image-and-ship-aot.md](./challenges/challenge-01-cut-the-image-and-ship-aot.md) | Cut the `Workshop.Api` image size dramatically and ship a Native AOT companion; measure cold start and size before/after |
+| [challenges/challenge-02-zero-downtime-deploy-and-rollback.md](./challenges/challenge-02-zero-downtime-deploy-and-rollback.md) | A zero-downtime rollout + rollback drill on Container Apps revisions; prove no dropped requests under a load generator |
+| [quiz.md](./quiz.md) | 10 multiple-choice questions on Dockerfiles, AOT, Actions, OIDC, Container Apps, probes, migrations, and rollback |
+| [homework.md](./homework.md) | Six practice problems for the week |
+| [mini-project/README.md](./mini-project/README.md) | **The capstone defense** — deploy, demo, and present the Polyglot Workshop; the runbook spec; portfolio packaging; the grading rubric; the final submission |
+
+## The "build succeeded" promise — restated, and a new deploy contract
+
+C9 has treated `dotnet build` output as a contract for fifteen weeks:
+
+```
+Build succeeded · 0 warnings · 0 errors · 1.42 s
+```
+
+For Week 15 we add a **deploy contract**: **one push to `main` reaches a live URL with the tests green.** Concretely — a commit to `main` triggers the GitHub Actions workflow; the workflow restores, builds, runs `Workshop.IntegrationTests` against Testcontainers, and only on green proceeds to publish the image and deploy it to Azure Container Apps; the gated migration runs before the new revision takes traffic; the new revision passes its readiness probe; traffic shifts. A pull request that adds a feature without a path to a live URL is, by this contract, incomplete. "It runs on my machine" is not a deploy; the pipeline is.
+
+We add a **runbook contract** too: **every operational action a grader can ask you to perform at the defense — deploy, roll back, find the logs, rotate the OIDC secret, handle a full database — is written down in `RUNBOOK.md` and can be followed by someone who did not build the system.** A runbook you have to be in the room to explain is not a runbook.
+
+> **Note on packages / tooling.** Containers: Docker Engine 27.x (or `colima`/`podman`), base images `mcr.microsoft.com/dotnet/sdk:9.0`, `mcr.microsoft.com/dotnet/aspnet:9.0` (and `:9.0-noble-chiseled`), `mcr.microsoft.com/dotnet/runtime-deps:9.0` for AOT. CI: GitHub Actions with `actions/checkout@v4`, `actions/setup-dotnet@v4`, `docker/login-action@v3`, `docker/build-push-action@v6`, `docker/setup-buildx-action@v3`, `azure/login@v2`, `azure/container-apps-deploy-action@v2`. Cloud CLIs: `az` ≥ 2.60 with the `containerapp` extension, `flyctl` latest. EF Core: `dotnet-ef` 9.0.x for `dotnet ef migrations bundle`. Observability carried forward from Week 14: `Serilog.AspNetCore`, the OpenTelemetry `.NET` SDK with the OTLP exporter. All free, all open source where applicable; the Azure and Fly.io free tiers cover the capstone with no charge.
