@@ -11,6 +11,13 @@ Ten multiple-choice questions. Take it with your lecture notes closed. Aim for 9
 - C) `Scoped` — one instance per HTTP request (per scope).
 - D) `Pooled` — reused from a pool, with `AddDbContextPool` as the explicit opt-in.
 
+<details>
+<summary>Answer</summary>
+
+**C.** `AddDbContext` registers the context as `Scoped` by default. `AddDbContextPool` opts into pooling on top of that. Cite <https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues>.
+
+</details>
+
 ---
 
 **Q2.** A `Product` entity has its `Price` updated in C# and `SaveChangesAsync` is called. What `UPDATE` statement does EF emit, by default?
@@ -20,6 +27,13 @@ Ten multiple-choice questions. Take it with your lecture notes closed. Aim for 9
 - C) `UPDATE Products SET Price=@p0, RowVersion=@p1 WHERE Id=@p2` — every column with a value type is included.
 - D) `DELETE FROM Products WHERE Id=@p0; INSERT INTO Products (...) VALUES (...)` — EF deletes and re-inserts.
 
+<details>
+<summary>Answer</summary>
+
+**B.** The change tracker takes a snapshot at load time and compares against current values at `SaveChanges` time. Only modified columns appear in the `SET` clause. Cite <https://learn.microsoft.com/en-us/ef/core/change-tracking/>.
+
+</details>
+
 ---
 
 **Q3.** Which method should you reach for to read 10,000 rows for a report endpoint that does not modify any of them?
@@ -28,6 +42,13 @@ Ten multiple-choice questions. Take it with your lecture notes closed. Aim for 9
 - B) `db.Products.AsTracking().ToListAsync()` — explicit tracking.
 - C) `db.Products.AsNoTracking().ToListAsync()` — skip the change tracker entirely.
 - D) `db.Products.Local.ToList()` — read from the local cache.
+
+<details>
+<summary>Answer</summary>
+
+**C.** `AsNoTracking` skips the tracker insert and the snapshot copy, saving 30-50% allocation and 15-30% time on read-only paths. Cite <https://learn.microsoft.com/en-us/ef/core/querying/tracking>.
+
+</details>
 
 ---
 
@@ -48,6 +69,13 @@ What is this and what is the fix?
 - C) A bug in EF Core. File an issue at `dotnet/efcore`.
 - D) Cartesian explosion. Fix with `AsSplitQuery()`.
 
+<details>
+<summary>Answer</summary>
+
+**B.** The N+1 problem. One outer query plus N inner queries with identical SQL and only the parameter changing. Cure with `Include`, projection, or explicit batched loading. Cite <https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying#use-eager-loading-when-appropriate>.
+
+</details>
+
 ---
 
 **Q5.** A query is `db.Customers.Include(c => c.Orders).Include(c => c.Addresses)`. On the seeded dataset (100 customers, 10 orders each, 3 addresses each), how many rows cross the wire from the database to the .NET process by default?
@@ -56,6 +84,13 @@ What is this and what is the fix?
 - B) 1,300 rows (100 customers + 1,000 orders + 300 addresses).
 - C) 3,000 rows (100 customers x 10 orders x 3 addresses, cartesian).
 - D) 13 rows (10 + 3 per customer, averaged).
+
+<details>
+<summary>Answer</summary>
+
+**C.** Cartesian explosion. The `LEFT JOIN` of two collections produces every order paired with every address, multiplicatively. 100 x 10 x 3 = 3,000 rows. Cure with `AsSplitQuery`. Cite <https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries>.
+
+</details>
 
 ---
 
@@ -66,6 +101,13 @@ What is this and what is the fix?
 - C) `db.Database.ExecuteSqlRawAsync($"SELECT * FROM Products WHERE Name LIKE '%{term}%'")` — `ExecuteSqlRaw` is safe.
 - D) `db.Products.Where(p => p.Name.Contains(term)).ToList()` — but only after escaping `term` with `Regex.Escape`.
 
+<details>
+<summary>Answer</summary>
+
+**B.** `FromSqlInterpolated` captures the template and the values separately as a `FormattableString`; each interpolation slot becomes a parameter. Concatenation (A) is the classic SQL-injection vulnerability. Cite <https://learn.microsoft.com/en-us/ef/core/querying/sql-queries#passing-parameters>.
+
+</details>
+
 ---
 
 **Q7.** What is **cartesian explosion** in the context of EF Core eager loading?
@@ -74,6 +116,13 @@ What is this and what is the fix?
 - B) The phenomenon where joining a parent table to two child collections produces a row count equal to the *product* of the two child cardinalities per parent, leading to multiplicative wire bytes.
 - C) The phenomenon where lazy loading issues exponentially many queries.
 - D) A bug in EF Core 8 fixed in EF Core 9.
+
+<details>
+<summary>Answer</summary>
+
+**B.** Cartesian explosion is the multiplicative-row-count problem from joining a parent against two sibling collections in one query. Cite <https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries>.
+
+</details>
 
 ---
 
@@ -84,6 +133,13 @@ What is this and what is the fix?
 - C) `dotnet ef dbcontext scaffold` — reverse-engineers the schema.
 - D) `dotnet ef migrations remove` — removes the last migration.
 
+<details>
+<summary>Answer</summary>
+
+**B.** `dotnet ef migrations script --idempotent` emits a SQL script that is safe to apply against any schema state — the `IF NOT EXISTS` guards keyed off `__EFMigrationsHistory` ensure each migration body runs at most once. Cite <https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying#sql-scripts>.
+
+</details>
+
 ---
 
 **Q9.** A query is `EF.CompileAsyncQuery((CatalogDb db, int id) => db.Products.Find(id))`. The delegate is stored in a `static` field. What is the per-call performance benefit?
@@ -92,6 +148,13 @@ What is this and what is the fix?
 - B) The query reads from a memory cache instead of issuing a `SELECT`.
 - C) The LINQ-to-SQL translation step is cached, saving approximately 20-30 microseconds per call.
 - D) The query runs in parallel across multiple connections.
+
+<details>
+<summary>Answer</summary>
+
+**C.** The LINQ-to-SQL translation step costs 20-100 microseconds per uncompiled call; the compiled delegate caches the translation. Cite <https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics#compiled-queries>.
+
+</details>
 
 ---
 
@@ -102,29 +165,14 @@ What is this and what is the fix?
 - C) `ComplexProperty` — the EF Core 8 value-object API designed for same-row mapping without entity-tracking baggage.
 - D) `HasConversion<string>` — serialize the whole struct to a single string column.
 
+<details>
+<summary>Answer</summary>
+
+**C.** EF Core 8 introduced `ComplexProperty` specifically for same-row value objects without the entity-tracking machinery of `OwnsOne`. `OwnsOne` still works for existing code; `ComplexProperty` is the new-code recommendation. Cite <https://learn.microsoft.com/en-us/ef/core/modeling/complex-types>.
+
 ---
 
-## Answer key
-
-1. **C.** `AddDbContext` registers the context as `Scoped` by default. `AddDbContextPool` opts into pooling on top of that. Cite <https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/#avoiding-dbcontext-threading-issues>.
-
-2. **B.** The change tracker takes a snapshot at load time and compares against current values at `SaveChanges` time. Only modified columns appear in the `SET` clause. Cite <https://learn.microsoft.com/en-us/ef/core/change-tracking/>.
-
-3. **C.** `AsNoTracking` skips the tracker insert and the snapshot copy, saving 30-50% allocation and 15-30% time on read-only paths. Cite <https://learn.microsoft.com/en-us/ef/core/querying/tracking>.
-
-4. **B.** The N+1 problem. One outer query plus N inner queries with identical SQL and only the parameter changing. Cure with `Include`, projection, or explicit batched loading. Cite <https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying#use-eager-loading-when-appropriate>.
-
-5. **C.** Cartesian explosion. The `LEFT JOIN` of two collections produces every order paired with every address, multiplicatively. 100 x 10 x 3 = 3,000 rows. Cure with `AsSplitQuery`. Cite <https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries>.
-
-6. **B.** `FromSqlInterpolated` captures the template and the values separately as a `FormattableString`; each interpolation slot becomes a parameter. Concatenation (A) is the classic SQL-injection vulnerability. Cite <https://learn.microsoft.com/en-us/ef/core/querying/sql-queries#passing-parameters>.
-
-7. **B.** Cartesian explosion is the multiplicative-row-count problem from joining a parent against two sibling collections in one query. Cite <https://learn.microsoft.com/en-us/ef/core/querying/single-split-queries>.
-
-8. **B.** `dotnet ef migrations script --idempotent` emits a SQL script that is safe to apply against any schema state — the `IF NOT EXISTS` guards keyed off `__EFMigrationsHistory` ensure each migration body runs at most once. Cite <https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying#sql-scripts>.
-
-9. **C.** The LINQ-to-SQL translation step costs 20-100 microseconds per uncompiled call; the compiled delegate caches the translation. Cite <https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics#compiled-queries>.
-
-10. **C.** EF Core 8 introduced `ComplexProperty` specifically for same-row value objects without the entity-tracking machinery of `OwnsOne`. `OwnsOne` still works for existing code; `ComplexProperty` is the new-code recommendation. Cite <https://learn.microsoft.com/en-us/ef/core/modeling/complex-types>.
+</details>
 
 ---
 

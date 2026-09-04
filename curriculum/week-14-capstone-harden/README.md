@@ -32,6 +32,14 @@ By the end of this week, you will be able to:
 - **Benchmark** a hot path with BenchmarkDotNet and turn it into a regression gate that fails CI on a slowdown. Cite <https://github.com/dotnet/BenchmarkDotNet>.
 - **Cover** every privileged path with an integration test that proves the unauthorized and cross-tenant cases are rejected. Cite <https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests>.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: a second programming course grades whether the program works, not whether it holds when somebody attacks it. What transfers is the invariant discipline applied here — state the rule, then make the type system and the tests enforce it. |
+| Industry | Prove a boundary leaks, close it at the structural layer so it cannot be reintroduced by the next feature, and leave behind the test that catches the regression. |
+| Beyond the bar | A latency spike on a dashboard that links straight to the one trace that caused it, through an OpenTelemetry exemplar — `challenges/challenge-02-exemplar-spike-to-trace.md` |
+
 ## Prerequisites
 
 - **Weeks 6, 12, and 13 of C9 complete.** Week 6 (auth and Identity) is the foundation for the OIDC/JWT work; Week 12 (production-grade integration) is the `WebApplicationFactory` + Testcontainers + OpenTelemetry foundation; Week 13 (the capstone *build* milestone) is the literal repository you extend. The other weeks (2-5, 7-11) are assumed.

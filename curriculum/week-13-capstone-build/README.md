@@ -32,6 +32,14 @@ By the end of this week, you will be able to:
 - **Reason** about the difference between a unit test (calls a method) and an integration test (boots the host against a real database), and which the milestone requires. **Cite** <https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests>.
 - **Cite** the Protocol Buffers language guide, the gRPC for .NET docs, the EF Core Npgsql provider, Testcontainers for .NET, the Serilog and OpenTelemetry repositories, and the GitHub Actions .NET workflow guide for each technique covered.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `EECS 280` — Complete a substantial multi-file program of the learner's own design, built against a specification written before the code. |
+| Industry | Take a contract to a working vertical slice that is green in continuous integration from a clean checkout, on a machine that is not yours and that you cannot log into. |
+| Beyond the bar | Renaming one field in the `.proto` and watching every consumer break — the contract proven load-bearing rather than described as such — `challenges/challenge-01-rename-a-field-watch-it-break.md` |
+
 ## Prerequisites
 
 - **Weeks 1–12 of C9 complete.** This is the first capstone week; it assumes minimal APIs (Week 2), EF Core (Weeks 3, 10), gRPC (Week 9), SignalR (Week 11), and the composition + integration-testing discipline of Week 12. Where a concept is reused we cite the lecture that introduced it.

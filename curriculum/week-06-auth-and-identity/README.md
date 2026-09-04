@@ -26,6 +26,14 @@ By the end of this week, you will be able to:
 - **Test** every authorization decision with `WebApplicationFactory<T>` and a fake authentication scheme that issues a known `ClaimsPrincipal` per test. No production credentials in tests, ever.
 - **Recognize** the three places people leak tokens — query strings, log files, client-side JavaScript — and the three CSRF / XSS / token-theft mistakes that ASP.NET Core's defaults already prevent if you do not override them.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: a second programming course's program has one user. This week gives it many, with different rights, and makes each rule an object that can be unit tested rather than a condition buried in a handler. |
+| Industry | Sign a user in, issue and validate a bearer token, and express an access rule as a policy the test suite can exercise on its own. |
+| Beyond the bar | Custom `IAuthorizationRequirement` and `AuthorizationHandler<T>` pairs, including resource-based handlers that receive the row they are guarding, and the multi-tenant case where one wrong handler hands a customer somebody else's data — `challenges/challenge-01-multi-tenant-authorization.md` |
+
 ## Prerequisites
 
 - **Weeks 1, 2, 3, 4, and 5** of C9 complete: you can scaffold a multi-project solution from the `dotnet` CLI, you can write Minimal API endpoints with `TypedResults`, you can model an EF Core `DbContext`, you can compose `async`/`await` and `CancellationToken` through a `Channel<T>` pipeline, you can read a LINQ chain out loud as the question it answers, and your `dotnet build` reflexively prints `Build succeeded · 0 warnings · 0 errors`.

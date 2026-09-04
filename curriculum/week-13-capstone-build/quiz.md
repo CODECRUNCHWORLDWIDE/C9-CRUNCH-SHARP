@@ -11,6 +11,13 @@ In the Polyglot Workshop, the single declaration of the domain shape (`Lesson`, 
 - (C) `workshop.proto`; the service and every client consume the *generated* types, never a hand-rolled parallel DTO.
 - (D) An OpenAPI document that each client reads at runtime.
 
+<details>
+<summary>Answer</summary>
+
+**(C).** The capstone's architectural bet is that `workshop.proto` is the single source of truth and that the service and every client consume the *generated* types. A hand-rolled DTO in a client breaks the single-source rule. Citation: <https://protobuf.dev/programming-guides/proto3/> and the contract-first framing in Lecture 1.
+
+</details>
+
 ## Question 2 — Why proto3 enums start at zero
 
 `LessonStatus` is declared with `LESSON_STATUS_UNSPECIFIED = 0` as its first member. The reason is:
@@ -19,6 +26,13 @@ In the Polyglot Workshop, the single declaration of the domain shape (`Lesson`, 
 - (B) proto3 treats an unset enum scalar as `0`, so a zero `UNSPECIFIED` lets you distinguish "explicitly draft" from "client forgot to set it."
 - (C) C# requires enums to start at zero.
 - (D) Zero is reserved for the wire framing and cannot hold a real value.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** proto3 has no "absent" for scalar fields; an unset enum reads as `0`. A zero `UNSPECIFIED` member preserves the distinction between an explicit value and a forgotten one. Citation: <https://protobuf.dev/programming-guides/proto3/#enum>.
+
+</details>
 
 ## Question 3 — `Grpc.Tools` and `PrivateAssets`
 
@@ -29,6 +43,13 @@ The `Workshop.Contracts.csproj` references `Grpc.Tools` with `<PrivateAssets>All
 - (C) It is required for the generated client to be `public`.
 - (D) Without it, the `.proto` is not compiled.
 
+<details>
+<summary>Answer</summary>
+
+**(A).** `Grpc.Tools` runs `protoc` at build time; it is a tool, not a runtime library, so `PrivateAssets="All"` stops it flowing transitively to anything referencing `Workshop.Contracts`. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/basics>.
+
+</details>
+
 ## Question 4 — `GrpcServices="Both"`
 
 The `<Protobuf Include="workshop.proto" GrpcServices="Both" />` item generates:
@@ -37,6 +58,13 @@ The `<Protobuf Include="workshop.proto" GrpcServices="Both" />` item generates:
 - (B) Both the abstract `WorkshopBase` server class (the service overrides it) and the concrete `WorkshopClient` (every client constructs it).
 - (C) Two copies of the messages, one for the client and one for the server.
 - (D) A REST and a gRPC surface from the same file.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** `GrpcServices="Both"` emits the abstract `WorkshopBase` (overridden by the service) and the concrete `WorkshopClient` (constructed by clients). `"Server"` alone would omit the client; `"Client"` alone would omit the base class. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/basics#generated-c-assets>.
+
+</details>
 
 ## Question 5 — Why entities are separate from contract messages
 
@@ -47,6 +75,13 @@ The lecture keeps the EF Core `Enrollment` entity separate from the generated `E
 - (C) Performance — mapping is faster than direct persistence.
 - (D) There is no real reason; it is boilerplate.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** Separating the wire shape from the persistence shape keeps database concerns out of the contract and wire concerns out of the schema; the single `ToContract` boundary is where they meet. EF Core *can* persist many shapes, so (A) overstates; the real reason is design isolation. Citation: <https://learn.microsoft.com/en-us/ef/core/modeling/>.
+
+</details>
+
 ## Question 6 — The vertical slice
 
 "Ship a vertical slice on day one" means:
@@ -55,6 +90,13 @@ The lecture keeps the EF Core `Enrollment` entity separate from the generated `E
 - (B) Build the thinnest path that touches every layer — proto message → entity → migration → service method → client call — and get *that* green before building breadth.
 - (C) Build the UI first and stub the backend.
 - (D) Write every integration test before any production code.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** A vertical slice is the thinnest end-to-end path through every layer. Finishing one slice green de-risks the architecture; horizontal layer-by-layer building defers the integration risk to the worst possible moment. Citation: <https://www.jimmybogard.com/vertical-slice-architecture/>.
+
+</details>
 
 ## Question 7 — Idempotent enroll
 
@@ -65,6 +107,13 @@ The lecture keeps the EF Core `Enrollment` entity separate from the generated `E
 - (C) The unique index is the primary mechanism; the read is decorative.
 - (D) The read prevents the index from ever firing, so the index is dead code.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** The read-first branch makes a repeat enroll return the same enrollment (the primary idempotency behavior); the unique index is the database backstop for a race where two requests both pass the read before either inserts. Using the index violation *as* the idempotency mechanism turns an expected case into an exception. Citation: <https://learn.microsoft.com/en-us/ef/core/modeling/indexes>.
+
+</details>
+
 ## Question 8 — Why a real PostgreSQL in tests
 
 The integration baseline uses a real PostgreSQL 16 via Testcontainers rather than SQLite-in-memory. The reason is:
@@ -73,6 +122,13 @@ The integration baseline uses a real PostgreSQL 16 via Testcontainers rather tha
 - (B) SQLite-in-memory hides Npgsql-specific behavior — `timestamptz` round-tripping, the unique-index violation shape, snake_case case folding — that the baseline exists to catch.
 - (C) Testcontainers cannot run SQLite.
 - (D) The contract requires PostgreSQL at the wire level.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** SQLite-in-memory is a different provider and silently papers over Npgsql-specific behavior — exactly the behavior the baseline must validate. The capstone's rule is a real PostgreSQL via Testcontainers, every time. Citation: <https://dotnet.testcontainers.org/modules/postgres/>.
+
+</details>
 
 ## Question 9 — The gRPC client in the integration test
 
@@ -83,6 +139,13 @@ The integration test builds its `WorkshopClient` over `Server.CreateHandler()` r
 - (C) `ForAddress` cannot construct a `WorkshopClient`.
 - (D) The handler form skips authentication, which the test needs.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** `WebApplicationFactory`'s `Server.CreateHandler()` gives an `HttpMessageHandler` that drives the in-memory `TestServer` pipeline directly. The `WorkshopClient` over that handler exercises the real service with no socket and no separately-hosted server. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/test-services>.
+
+</details>
+
 ## Question 10 — Green in CI, not green locally
 
 Milestone 1's pass condition is the integration baseline green on a GitHub Actions runner. A baseline that passes locally but fails in CI most commonly fails because:
@@ -92,20 +155,14 @@ Milestone 1's pass condition is the integration baseline green on a GitHub Actio
 - (C) The tests are non-deterministic by nature and cannot pass in CI.
 - (D) `WebApplicationFactory` only works on Windows.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** "Works locally, red in CI" is almost always the runner OS, the Docker socket Testcontainers needs, the pinned SDK version, or a cold-runner image-pull timeout — none present on your warm dev box. Challenge 2 makes you reproduce and fix each. Citation: <https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-net>.
+
+</details>
+
 ---
-
-## Answer key
-
-- **Q1: (C).** The capstone's architectural bet is that `workshop.proto` is the single source of truth and that the service and every client consume the *generated* types. A hand-rolled DTO in a client breaks the single-source rule. Citation: <https://protobuf.dev/programming-guides/proto3/> and the contract-first framing in Lecture 1.
-- **Q2: (B).** proto3 has no "absent" for scalar fields; an unset enum reads as `0`. A zero `UNSPECIFIED` member preserves the distinction between an explicit value and a forgotten one. Citation: <https://protobuf.dev/programming-guides/proto3/#enum>.
-- **Q3: (A).** `Grpc.Tools` runs `protoc` at build time; it is a tool, not a runtime library, so `PrivateAssets="All"` stops it flowing transitively to anything referencing `Workshop.Contracts`. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/basics>.
-- **Q4: (B).** `GrpcServices="Both"` emits the abstract `WorkshopBase` (overridden by the service) and the concrete `WorkshopClient` (constructed by clients). `"Server"` alone would omit the client; `"Client"` alone would omit the base class. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/basics#generated-c-assets>.
-- **Q5: (B).** Separating the wire shape from the persistence shape keeps database concerns out of the contract and wire concerns out of the schema; the single `ToContract` boundary is where they meet. EF Core *can* persist many shapes, so (A) overstates; the real reason is design isolation. Citation: <https://learn.microsoft.com/en-us/ef/core/modeling/>.
-- **Q6: (B).** A vertical slice is the thinnest end-to-end path through every layer. Finishing one slice green de-risks the architecture; horizontal layer-by-layer building defers the integration risk to the worst possible moment. Citation: <https://www.jimmybogard.com/vertical-slice-architecture/>.
-- **Q7: (B).** The read-first branch makes a repeat enroll return the same enrollment (the primary idempotency behavior); the unique index is the database backstop for a race where two requests both pass the read before either inserts. Using the index violation *as* the idempotency mechanism turns an expected case into an exception. Citation: <https://learn.microsoft.com/en-us/ef/core/modeling/indexes>.
-- **Q8: (B).** SQLite-in-memory is a different provider and silently papers over Npgsql-specific behavior — exactly the behavior the baseline must validate. The capstone's rule is a real PostgreSQL via Testcontainers, every time. Citation: <https://dotnet.testcontainers.org/modules/postgres/>.
-- **Q9: (B).** `WebApplicationFactory`'s `Server.CreateHandler()` gives an `HttpMessageHandler` that drives the in-memory `TestServer` pipeline directly. The `WorkshopClient` over that handler exercises the real service with no socket and no separately-hosted server. Citation: <https://learn.microsoft.com/en-us/aspnet/core/grpc/test-services>.
-- **Q10: (B).** "Works locally, red in CI" is almost always the runner OS, the Docker socket Testcontainers needs, the pinned SDK version, or a cold-runner image-pull timeout — none present on your warm dev box. Challenge 2 makes you reproduce and fix each. Citation: <https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-net>.
 
 ## Self-assessment
 

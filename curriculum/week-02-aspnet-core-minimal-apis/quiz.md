@@ -11,6 +11,13 @@ Ten multiple-choice questions. Take it with your lecture notes closed. Aim for 9
 - C) Minimal APIs replaced MVC in .NET 6; MVC is no longer supported.
 - D) MVC is for HTTP and Minimal APIs are for gRPC; they target different protocols.
 
+<details>
+<summary>Answer</summary>
+
+**B** — Minimal APIs and MVC are two routing models that share Kestrel, the DI container, and the OpenAPI generator. The difference is whether the route target is a delegate (Minimal) or a method on a class (MVC). They coexist freely in the same project.
+
+</details>
+
 ---
 
 **Q2.** Given:
@@ -26,6 +33,13 @@ What is the default binding source of each parameter?
 - C) `id` from route, `status` from headers, `repo` from the body, `ct` from the query.
 - D) Minimal APIs cannot infer binding sources; every parameter requires a `[From*]` attribute.
 
+<details>
+<summary>Answer</summary>
+
+**B** — The framework matches parameter names against route values first, then falls back to query for simple types, then to services for registered types. `CancellationToken` is always the request's cancellation token. No `[From*]` attribute is needed for any of these — the inference is reliable.
+
+</details>
+
 ---
 
 **Q3.** Which handler signature gives the OpenAPI generator the most precise response metadata?
@@ -34,6 +48,13 @@ What is the default binding source of each parameter?
 - B) `static object Get(int id, IStore s) { ... }`
 - C) `static async Task<Results<Ok<Order>, NotFound>> Get(int id, IStore s, CancellationToken ct) { ... }`
 - D) `static dynamic Get(int id, IStore s) { ... }`
+
+<details>
+<summary>Answer</summary>
+
+**C** — `Results<Ok<Order>, NotFound>` is a typed union of possible results. The compiler enforces that every return path is one of the listed cases, and the OpenAPI generator records every case with its schema. A, B, and D all collapse to `application/json` of unknown shape.
+
+</details>
 
 ---
 
@@ -50,6 +71,13 @@ How many `EfTodoRepository` instances does the container construct across two co
 - C) 4 — fresh every resolution.
 - D) 0 — scoped services are lazy and only construct on first iteration.
 
+<details>
+<summary>Answer</summary>
+
+**B** — Scoped means "one instance per `IServiceScope`." In ASP.NET Core, the framework creates one scope per HTTP request. Within a single request, the same instance is returned every time `ITodoRepository` is resolved. Two requests = two scopes = two instances.
+
+</details>
+
 ---
 
 **Q5.** Which of the following is a **captive dependency** bug?
@@ -58,6 +86,13 @@ How many `EfTodoRepository` instances does the container construct across two co
 - B) A scoped service whose constructor takes another scoped service.
 - C) A singleton service whose constructor takes a scoped service.
 - D) A transient service whose constructor takes a scoped service.
+
+<details>
+<summary>Answer</summary>
+
+**C** — A captive dependency is a longer-lived service holding a reference to a shorter-lived one. Singleton-holding-scoped is the textbook case: the scoped service ends up living for the lifetime of the singleton (forever), defeating its purpose and often leaking the underlying resource (e.g. a `DbContext`).
+
+</details>
 
 ---
 
@@ -77,6 +112,13 @@ public sealed record CreateTodoRequest(
 - C) 422 Unprocessable Entity with the same body.
 - D) The handler throws a `ValidationException` at runtime.
 
+<details>
+<summary>Answer</summary>
+
+**B** — `.WithParameterValidation()` from `MinimalApis.Extensions` reads the data-annotation attributes, runs validation before the handler, and short-circuits with `TypedResults.ValidationProblem` (400 + problem-details JSON) on failure. The handler never runs.
+
+</details>
+
 ---
 
 **Q7.** Why does C9 recommend turning on `ValidateOnBuild = true` in `Program.cs`?
@@ -85,6 +127,13 @@ public sealed record CreateTodoRequest(
 - B) It eagerly validates every registered service at `builder.Build()` time, so captive dependencies and missing registrations crash the app at startup instead of at first request.
 - C) It enables JIT compilation of all endpoint handlers ahead of time.
 - D) It is required for `TypedResults` to work.
+
+<details>
+<summary>Answer</summary>
+
+**B** — `ValidateOnBuild` validates every registration eagerly at startup. The cost is a few extra milliseconds at boot; the benefit is that registration mistakes (missing services, captive dependencies, circular deps) fail at startup instead of on the first request. C9 turns it on in every environment from Week 2 onward.
+
+</details>
 
 ---
 
@@ -95,6 +144,13 @@ public sealed record CreateTodoRequest(
 - C) `NoContent` — `TypedResults.NoContent()`
 - D) `Accepted<T>` — `TypedResults.Accepted("/path", value)`
 
+<details>
+<summary>Answer</summary>
+
+**B** — `TypedResults.Created("/path", value)` produces HTTP 201 Created with the `Location` header set to `"/path"` and `value` serialized as the body. It is the standard response for a successful resource creation in REST.
+
+</details>
+
 ---
 
 **Q9.** Inside an `IHostedService` background worker that runs every minute, you need to use a scoped `ITodoStore`. Which is the correct way to resolve it?
@@ -103,6 +159,13 @@ public sealed record CreateTodoRequest(
 - B) Inject `IServiceProvider` and call `GetRequiredService<ITodoStore>()` once at startup.
 - C) Inject `IServiceScopeFactory`, create a scope per cycle with `CreateAsyncScope`, resolve `ITodoStore` from the scope's `ServiceProvider`, and dispose the scope at the end of the cycle.
 - D) Register `ITodoStore` as a singleton in `Program.cs` so it can be injected directly.
+
+<details>
+<summary>Answer</summary>
+
+**C** — `IServiceScopeFactory` is the pattern for resolving scoped services from long-lived components. Injecting `ITodoStore` directly into a singleton/hosted service is a captive dependency (the container will block this at startup with `ValidateScopes` on). Widening `ITodoStore` to singleton solves the symptom but breaks the lifetime model.
+
+</details>
 
 ---
 
@@ -113,26 +176,16 @@ public sealed record CreateTodoRequest(
 - C) `Newtonsoft.OpenApi` generates the document; ASP.NET Core renders the UI built-in.
 - D) The framework generates and renders both built-in; no extra package is needed for either.
 
----
-
-## Answer key
-
 <details>
-<summary>Click to reveal answers</summary>
+<summary>Answer</summary>
 
-1. **B** — Minimal APIs and MVC are two routing models that share Kestrel, the DI container, and the OpenAPI generator. The difference is whether the route target is a delegate (Minimal) or a method on a class (MVC). They coexist freely in the same project.
-2. **B** — The framework matches parameter names against route values first, then falls back to query for simple types, then to services for registered types. `CancellationToken` is always the request's cancellation token. No `[From*]` attribute is needed for any of these — the inference is reliable.
-3. **C** — `Results<Ok<Order>, NotFound>` is a typed union of possible results. The compiler enforces that every return path is one of the listed cases, and the OpenAPI generator records every case with its schema. A, B, and D all collapse to `application/json` of unknown shape.
-4. **B** — Scoped means "one instance per `IServiceScope`." In ASP.NET Core, the framework creates one scope per HTTP request. Within a single request, the same instance is returned every time `ITodoRepository` is resolved. Two requests = two scopes = two instances.
-5. **C** — A captive dependency is a longer-lived service holding a reference to a shorter-lived one. Singleton-holding-scoped is the textbook case: the scoped service ends up living for the lifetime of the singleton (forever), defeating its purpose and often leaking the underlying resource (e.g. a `DbContext`).
-6. **B** — `.WithParameterValidation()` from `MinimalApis.Extensions` reads the data-annotation attributes, runs validation before the handler, and short-circuits with `TypedResults.ValidationProblem` (400 + problem-details JSON) on failure. The handler never runs.
-7. **B** — `ValidateOnBuild` validates every registration eagerly at startup. The cost is a few extra milliseconds at boot; the benefit is that registration mistakes (missing services, captive dependencies, circular deps) fail at startup instead of on the first request. C9 turns it on in every environment from Week 2 onward.
-8. **B** — `TypedResults.Created("/path", value)` produces HTTP 201 Created with the `Location` header set to `"/path"` and `value` serialized as the body. It is the standard response for a successful resource creation in REST.
-9. **C** — `IServiceScopeFactory` is the pattern for resolving scoped services from long-lived components. Injecting `ITodoStore` directly into a singleton/hosted service is a captive dependency (the container will block this at startup with `ValidateScopes` on). Widening `ITodoStore` to singleton solves the symptom but breaks the lifetime model.
-10. **B** — Starting with .NET 9, `Microsoft.AspNetCore.OpenApi` is the default OpenAPI 3.1 generator built into ASP.NET Core. Swashbuckle.AspNetCore.SwaggerUI is the in-browser viewer; it does not generate the document any more. The two libraries do separate jobs.
+**B** — Starting with .NET 9, `Microsoft.AspNetCore.OpenApi` is the default OpenAPI 3.1 generator built into ASP.NET Core. Swashbuckle.AspNetCore.SwaggerUI is the in-browser viewer; it does not generate the document any more. The two libraries do separate jobs.
+
+
+---
 
 </details>
 
----
-
 If you scored under 7, re-read the lectures for the questions you missed. If you scored 9 or 10, you're ready to dive into the [homework](./homework.md).
+
+---

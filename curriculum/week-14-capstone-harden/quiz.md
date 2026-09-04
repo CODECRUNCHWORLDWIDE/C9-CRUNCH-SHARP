@@ -11,6 +11,13 @@ Ten multiple-choice questions covering the OWASP API Security Top 10 in .NET, te
 - (C) Security misconfiguration (API8) — the route is exposed.
 - (D) Not a vulnerability; `RequireAuthorization()` covers it.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** This is the textbook BOLA (API1): the endpoint authenticates (valid token) but never authorizes the *object* (does the caller own this row). `RequireAuthorization()` proves identity, not ownership. It is the most common and most damaging API vulnerability. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/>.
+
+</details>
+
 ## Question 2 — The right status for "not yours"
 
 A caller requests a row that exists but belongs to another tenant. The correct response is:
@@ -19,6 +26,13 @@ A caller requests a row that exists but belongs to another tenant. The correct r
 - (B) `404 Not Found`, because confirming the row exists is itself an information leak.
 - (C) `200 OK` with an empty body.
 - (D) `401 Unauthorized`.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** Return `404`. A `403` confirms the row exists, telling an attacker that id `X` is a real object in some tenant — an information leak. "Not yours" and "does not exist" should be indistinguishable to the caller. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/>.
+
+</details>
 
 ## Question 3 — The structural BOLA fix
 
@@ -29,6 +43,13 @@ You closed the leak with a per-handler `Where(s => s.TenantId == tenant.TenantId
 - (C) Renaming the route to include the tenant id.
 - (D) Moving the check into a middleware that inspects the URL.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** The EF Core global query filter (`HasQueryFilter`) is applied to *every* query against the entity, so a forgotten per-handler `Where` no longer leaks. One filter deletes a whole class of forgettable checks — the editing thesis. Citation: <https://learn.microsoft.com/en-us/ef/core/querying/filters>.
+
+</details>
+
 ## Question 4 — Mass assignment (API3)
 
 `POST /api/submissions` binds the request body straight to the `Submission` entity, which has a `Grade` and a `TenantId`. The risk and fix are:
@@ -37,6 +58,13 @@ You closed the leak with a per-handler `Where(s => s.TenantId == tenant.TenantId
 - (B) A learner can set `Grade` and `TenantId` from the body (mass assignment); the fix is a request DTO containing only client-settable fields, with the server owning `Grade` and `TenantId`.
 - (C) The risk is SQL injection; the fix is parameterized queries.
 - (D) The risk is over-fetching; the fix is paging.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** Binding the body to the entity lets the client set server-owned fields (mass assignment, API3). The fix is a request DTO with only client-settable fields; the server sets `Grade`, `TenantId`, `CreatedAt` from the token and clock, never the body. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/>.
+
+</details>
 
 ## Question 5 — When MediatR earns its keep
 
@@ -47,6 +75,13 @@ The decisive test for whether a path belongs behind MediatR is:
 - (C) Whether it returns more than one field.
 - (D) Whether it is called from more than one client.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** MediatR's value is the pipeline behavior — a cross-cutting wrapper written once. If no behavior would apply (a health probe, a trivial lookup), the request/handler/registration/`Send` are four artifacts replacing one method call; delete the mediator. Citation: <https://github.com/jbogard/MediatR/wiki/Behaviors>.
+
+</details>
+
 ## Question 6 — When to SKIP AutoMapper
 
 Which mapping is the *worst* candidate for an AutoMapper profile?
@@ -55,6 +90,13 @@ Which mapping is the *worst* candidate for an AutoMapper profile?
 - (B) `Submission -> SubmissionDto`, which must hide `TenantId` and `IsFlagged` and compute a `StatusLabel` from `Grade` — the map is a security boundary and carries logic.
 - (C) A copy of a record with identical shape.
 - (D) Any map where source and destination property names match exactly.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** A map that hides fields (a security boundary) and computes values (carries logic) is the worst AutoMapper candidate — convention *includes by default*, the wrong default for a DTO that must exclude `TenantId`, and logic-in-configuration is hard to debug. A hand-written `ToDto()` is clearer and auditable. (A) is the *good* candidate. Citation: <https://docs.automapper.org/en/stable/Configuration-validation.html>.
+
+</details>
 
 ## Question 7 — Polly strategy order
 
@@ -65,6 +107,13 @@ A resilience pipeline wraps an outbound call with a timeout, a retry, and a circ
 - (C) Breaker → retry → timeout.
 - (D) Order does not matter; Polly normalizes it.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** Timeout innermost bounds each attempt; retry wraps it to re-try the bounded attempt; the circuit breaker outermost stops hammering a dead downstream. Reversed, the timeout would bound the whole retry sequence and the breaker would trip per-attempt — wrong semantics. Citation: <https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience>.
+
+</details>
+
 ## Question 8 — Why the outbox
 
 The capstone moves the `SubmissionCreated` broadcast from inline-in-the-handler to a transactional outbox drained by a `BackgroundService`. The reason is:
@@ -73,6 +122,13 @@ The capstone moves the `SubmissionCreated` broadcast from inline-in-the-handler 
 - (B) So a learner's submission succeeds (and commits) even when SignalR or the notification downstream is down — the user's success no longer depends on an unrelated subsystem's availability; the domain row and the outbox row commit in one transaction and the drainer retries the broadcast later.
 - (C) To reduce database connections.
 - (D) Because background services cannot use EF Core.
+
+<details>
+<summary>Answer</summary>
+
+**(B).** The outbox decouples the user's success from a downstream's availability. The domain row and the outbox row commit in one transaction; the drainer broadcasts later, Polly-wrapped, retrying without touching the request. A slow downstream degrades a feature instead of failing the submission. Citation: <https://learn.microsoft.com/en-us/dotnet/core/extensions/workers>.
+
+</details>
 
 ## Question 9 — Why the outbox drainer bypasses the query filter
 
@@ -83,6 +139,13 @@ The `OutboxDrainer` calls `IgnoreQueryFilters()` on its `outbox_messages` query.
 - (C) Nothing changes; the filter does not apply to background services.
 - (D) The messages would be deleted instead of processed.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** The global tenant query filter reads the current request's tenant; a background drainer has no request, so the filter would resolve to an empty/wrong tenant and hide every message — the outbox would silently never drain. `IgnoreQueryFilters()` is the deliberate, documented escape hatch for cross-tenant background work. Citation: <https://learn.microsoft.com/en-us/ef/core/querying/filters>.
+
+</details>
+
 ## Question 10 — What an exemplar buys you
 
 You record the analytics-latency histogram inside an active span and enable exemplars in Grafana and Prometheus. The capability this unlocks is:
@@ -92,20 +155,14 @@ You record the analytics-latency histogram inside an active span and enable exem
 - (C) Automatic alerting on every request.
 - (D) Lower telemetry cost.
 
+<details>
+<summary>Answer</summary>
+
+**(B).** An exemplar attaches a sample `trace_id` to a metric data point (recorded automatically when the histogram `Record` runs inside an active span). In Grafana, clicking the spike jumps to that trace in Tempo, and trace-to-logs reaches Loki — the metric → trace → log path that lets you debug an incident without a debugger. Citation: <https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars> and <https://grafana.com/docs/grafana/latest/fundamentals/exemplars/>.
+
+</details>
+
 ---
-
-## Answer key
-
-- **Q1: (B).** This is the textbook BOLA (API1): the endpoint authenticates (valid token) but never authorizes the *object* (does the caller own this row). `RequireAuthorization()` proves identity, not ownership. It is the most common and most damaging API vulnerability. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/>.
-- **Q2: (B).** Return `404`. A `403` confirms the row exists, telling an attacker that id `X` is a real object in some tenant — an information leak. "Not yours" and "does not exist" should be indistinguishable to the caller. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/>.
-- **Q3: (B).** The EF Core global query filter (`HasQueryFilter`) is applied to *every* query against the entity, so a forgotten per-handler `Where` no longer leaks. One filter deletes a whole class of forgettable checks — the editing thesis. Citation: <https://learn.microsoft.com/en-us/ef/core/querying/filters>.
-- **Q4: (B).** Binding the body to the entity lets the client set server-owned fields (mass assignment, API3). The fix is a request DTO with only client-settable fields; the server sets `Grade`, `TenantId`, `CreatedAt` from the token and clock, never the body. Citation: <https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/>.
-- **Q5: (B).** MediatR's value is the pipeline behavior — a cross-cutting wrapper written once. If no behavior would apply (a health probe, a trivial lookup), the request/handler/registration/`Send` are four artifacts replacing one method call; delete the mediator. Citation: <https://github.com/jbogard/MediatR/wiki/Behaviors>.
-- **Q6: (B).** A map that hides fields (a security boundary) and computes values (carries logic) is the worst AutoMapper candidate — convention *includes by default*, the wrong default for a DTO that must exclude `TenantId`, and logic-in-configuration is hard to debug. A hand-written `ToDto()` is clearer and auditable. (A) is the *good* candidate. Citation: <https://docs.automapper.org/en/stable/Configuration-validation.html>.
-- **Q7: (B).** Timeout innermost bounds each attempt; retry wraps it to re-try the bounded attempt; the circuit breaker outermost stops hammering a dead downstream. Reversed, the timeout would bound the whole retry sequence and the breaker would trip per-attempt — wrong semantics. Citation: <https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience>.
-- **Q8: (B).** The outbox decouples the user's success from a downstream's availability. The domain row and the outbox row commit in one transaction; the drainer broadcasts later, Polly-wrapped, retrying without touching the request. A slow downstream degrades a feature instead of failing the submission. Citation: <https://learn.microsoft.com/en-us/dotnet/core/extensions/workers>.
-- **Q9: (B).** The global tenant query filter reads the current request's tenant; a background drainer has no request, so the filter would resolve to an empty/wrong tenant and hide every message — the outbox would silently never drain. `IgnoreQueryFilters()` is the deliberate, documented escape hatch for cross-tenant background work. Citation: <https://learn.microsoft.com/en-us/ef/core/querying/filters>.
-- **Q10: (B).** An exemplar attaches a sample `trace_id` to a metric data point (recorded automatically when the histogram `Record` runs inside an active span). In Grafana, clicking the spike jumps to that trace in Tempo, and trace-to-logs reaches Loki — the metric → trace → log path that lets you debug an incident without a debugger. Citation: <https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars> and <https://grafana.com/docs/grafana/latest/fundamentals/exemplars/>.
 
 ## Self-assessment
 

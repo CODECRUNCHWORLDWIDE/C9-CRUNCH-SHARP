@@ -39,6 +39,14 @@ By the end of this week, you will be able to:
 - **Observe** SignalR through `dotnet-counters monitor Microsoft.AspNetCore.Http.Connections` and read the `connections-started`, `connections-stopped`, `connections-duration` counters. Cite <https://learn.microsoft.com/en-us/aspnet/core/signalr/diagnostics>.
 - **Cite** Microsoft Learn SignalR documentation, the `dotnet/aspnetcore` GitHub source for SignalR, and the `MessagePack-CSharp` GitHub repository for each technique covered.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: a second programming course's program runs to completion and exits. This week's program holds thousands of open connections and has to survive losing them. |
+| Industry | Keep a real-time feature correct across a dropped network — no duplicate messages, none lost inside the retry window — and keep it correct once there is more than one server instance. |
+| Beyond the bar | Two server instances behind a Redis backplane with MessagePack on the wire, proving that a message published on one instance reaches a client connected to the other — `challenges/challenge-01-redis-backplane-and-messagepack.md` |
+
 ## Prerequisites
 
 - **Week 2 of C9 complete.** You can stand up an ASP.NET Core minimal-API host, wire services into DI, and read `appsettings.json`. A SignalR hub is registered the same way a controller is.

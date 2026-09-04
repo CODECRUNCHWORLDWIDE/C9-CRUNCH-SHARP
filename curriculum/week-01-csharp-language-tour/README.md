@@ -21,6 +21,14 @@ By the end of this week, you will be able to:
 - **Run** an xUnit test from the terminal and read its output.
 - **Package** a small typed CLI using `System.CommandLine`.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Define classes and objects in a statically typed language, and build, run and test a multi-file program with the toolchain that language ships with. |
+| Industry | Take a blank folder to a project that builds, runs and tests from the terminal on macOS, Linux or Windows, and keep the build at zero warnings while you do it. |
+| Beyond the bar | The build graph, the anatomy of a `.csproj`, and pinning a whole solution's package versions once with `Directory.Packages.props` — none of which a second programming course asks for — `lecture-notes/01-the-dotnet-stack-and-toolchain.md` |
+
 ## Prerequisites
 
 This week assumes you have completed **C1 · Code Crunch Convos** weeks 1–11, or have equivalent Python (or other-language) fluency. Specifically:

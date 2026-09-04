@@ -25,6 +25,14 @@ By the end of this week, you will be able to:
 - **Pick** between `LINQ.Where(...).ToList()` and a manual `for` loop based on benchmarked allocations — and know that on `List<T>` of fewer than ~1000 elements the answer is almost always "use LINQ, it doesn't matter."
 - **Author** a small set of generic LINQ extension methods (`Chunk`, `Tap`, `WhereNotNull`, `DistinctBy`) that read like first-class operators in your downstream code.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `CS 106B` — Choose among the standard collections, transform them, and model a closed family of related types so that every case is handled. |
+| Industry | Rewrite a procedural report that works into a pipeline the next person can read, and prove with a benchmark that you did not make it slower on the way. |
+| Beyond the bar | Re-implementing `Where`, `Select` and `SelectMany` from scratch over `IEnumerable<T>`, then reading the framework's own source and comparing it against what you wrote — `challenges/challenge-01-implement-your-own-where-select.md` |
+
 ## Prerequisites
 
 - **Weeks 1, 2, 3, and 4** of C9 complete: you can scaffold a multi-project solution from the `dotnet` CLI, you can write Minimal API endpoints with `TypedResults`, you can model an EF Core `DbContext`, you can compose `async`/`await` and `CancellationToken` through a `Channel<T>` pipeline, and your `dotnet build` reflexively prints `Build succeeded · 0 warnings · 0 errors`.

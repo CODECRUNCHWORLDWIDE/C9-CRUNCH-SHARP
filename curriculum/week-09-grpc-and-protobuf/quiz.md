@@ -11,6 +11,13 @@ Ten multiple-choice questions. Take it with your lecture notes closed. Aim for 9
 - C) The receiver sees `x = null`, the C# null reference.
 - D) The receiver's behaviour is undefined; different protobuf implementations disagree.
 
+<details>
+<summary>Answer</summary>
+
+**B.** Without `optional`, proto3 cannot distinguish unset from default. The wire emits nothing for default-valued scalars; the receiver sees the default. This is by design — proto3 traded the distinction for terser wire bytes — and the `optional` keyword is the way to opt back in to presence tracking.
+
+</details>
+
 ---
 
 **Q2.** A `.proto` file declares:
@@ -30,6 +37,13 @@ A v2 server adds `COLOR_BLUE = 3` and starts emitting it in responses. A v1 clie
 - C) The v1 client sees `color = COLOR_UNSPECIFIED` (the zero default).
 - D) The protobuf parser strips unknown enum values from the wire bytes.
 
+<details>
+<summary>Answer</summary>
+
+**B.** Proto3 enums are *open*: unknown integer values are preserved and surfaced as `(EnumType)integer`. The C# generated code does not throw. This is the basis of forward-compatible enum extension — v2 can add values and v1 clients tolerate them.
+
+</details>
+
 ---
 
 **Q3.** What does the proto3 wire format look like for `message X { int32 a = 1; int32 b = 2; }` with `a = 0` and `b = 7`?
@@ -38,6 +52,13 @@ A v2 server adds `COLOR_BLUE = 3` and starts emitting it in responses. A v1 clie
 - B) One field entry: tag `0x10` value `7`. Two bytes total. Field `a = 0` is the default and is not emitted.
 - C) Three field entries: `a = 0`, `b = 7`, and a trailing "end-of-message" marker.
 - D) JSON-encoded `{"a":0,"b":7}` wrapped in a length prefix.
+
+<details>
+<summary>Answer</summary>
+
+**B.** Default-valued scalars are not emitted in proto3. The tag for `b = 7` is `(2 << 3) | 0 = 16 = 0x10` (one byte) followed by the varint `7` (one byte). Total two bytes. `a = 0` produces zero bytes on the wire.
+
+</details>
 
 ---
 
@@ -55,6 +76,13 @@ What call type is this?
 - C) Client-streaming
 - D) Bidirectional streaming
 
+<details>
+<summary>Answer</summary>
+
+**B.** A method whose response side has `IServerStreamWriter<T>` is server-streaming. The presence of `IServerStreamWriter<T>` on the response side and the absence of `IAsyncStreamReader<T>` on the request side together identify the shape.
+
+</details>
+
 ---
 
 **Q5.** A C# client calls `client.IncrementAsync(request)` with no `deadline:` argument. The server is slow and takes 60 seconds. What happens?
@@ -63,6 +91,13 @@ What call type is this?
 - B) The client waits indefinitely. There is no default deadline in `Grpc.Net.Client`.
 - C) The client throws `RpcException` with `StatusCode.DeadlineExceeded` after 5 seconds.
 - D) The HTTP/2 keepalive forces the call to fail at the 30-second mark.
+
+<details>
+<summary>Answer</summary>
+
+**B.** `Grpc.Net.Client` has no default deadline. A call with no `deadline:` argument waits forever (or until the HTTP/2 keepalive eventually times out at the transport layer, but that is not a gRPC-level deadline). Always set a deadline on every call; the absence of one is the bug.
+
+</details>
 
 ---
 
@@ -73,6 +108,13 @@ What call type is this?
 - C) `StatusCode.Unauthorized`
 - D) `StatusCode.Internal`
 
+<details>
+<summary>Answer</summary>
+
+**B.** `Unauthenticated` is "who are you?" — the caller has not authenticated, or has authenticated with an invalid token. `PermissionDenied` is "you are authenticated as X, but X cannot do this." (C is not a real `StatusCode`; the gRPC analogue of HTTP 401 is `Unauthenticated`.)
+
+</details>
+
 ---
 
 **Q7.** Which of the following is **the** principal reason to choose proto-first gRPC over code-first (`protobuf-net.Grpc`)?
@@ -81,6 +123,13 @@ What call type is this?
 - B) Proto-first allows cross-language clients (Python, Go, Java, Swift, TypeScript) against the same schema. Code-first only supports .NET clients.
 - C) Proto-first is required by .NET 8; code-first only works on .NET Framework.
 - D) Proto-first supports streaming RPCs; code-first does not.
+
+<details>
+<summary>Answer</summary>
+
+**B.** Cross-language client generation is the principal value proposition of proto-first. Code-first generates only .NET code and locks you out of every other-language client your team will eventually want.
+
+</details>
 
 ---
 
@@ -91,6 +140,13 @@ What call type is this?
 - C) When the deadline fires server-side, `ServerCallContext.CancellationToken` is cancelled. Code that respects the token aborts cleanly.
 - D) Deadlines are guaranteed to be accurate to one millisecond regardless of network latency.
 
+<details>
+<summary>Answer</summary>
+
+**D.** Deadlines are not millisecond-accurate. They are accurate to whatever resolution the runtime's clock and the cancellation-token plumbing provide — typically 10-50ms in practice. Designing for sub-50ms deadline precision is a mistake.
+
+</details>
+
 ---
 
 **Q9.** A server-streaming RPC is opened, the C# client iterates `await foreach (var ev in call.ResponseStream.ReadAllAsync(ct))`, and the client breaks out of the loop after the third item. What happens to the underlying HTTP/2 stream?
@@ -99,6 +155,13 @@ What call type is this?
 - B) It is closed by the client's `RST_STREAM` frame when the `AsyncServerStreamingCall<T>` is disposed (typically by a `using` declaration on the call object). Forgetting the `using` leaks the stream.
 - C) The stream cannot be closed until the server has sent all events; the client must drain to the end.
 - D) The HTTP/2 connection is torn down entirely; all other concurrent streams on the channel are also broken.
+
+<details>
+<summary>Answer</summary>
+
+**B.** `AsyncServerStreamingCall<T>` is `IDisposable`. Disposing it (which a `using` declaration does at scope exit) sends `RST_STREAM` and tears the HTTP/2 stream down cleanly. Forgetting the `using` leaks a stream per early-exit — visible in `dotnet-counters monitor Grpc.AspNetCore.Server` as a growing current-streams count.
+
+</details>
 
 ---
 
@@ -109,29 +172,14 @@ What call type is this?
 - C) `Logging, Auth, Validation` run concurrently around `handler`.
 - D) Only the first-registered interceptor runs; the others are dead code.
 
+<details>
+<summary>Answer</summary>
+
+**A.** Interceptors wrap around the handler in registration order. First-registered runs "outermost" — its before-code runs first and its after-code runs last. ASP.NET Core middleware ordering uses the same model.
+
 ---
 
-## Answer key (no peeking until you have answered all ten)
-
-1. **B.** Without `optional`, proto3 cannot distinguish unset from default. The wire emits nothing for default-valued scalars; the receiver sees the default. This is by design — proto3 traded the distinction for terser wire bytes — and the `optional` keyword is the way to opt back in to presence tracking.
-
-2. **B.** Proto3 enums are *open*: unknown integer values are preserved and surfaced as `(EnumType)integer`. The C# generated code does not throw. This is the basis of forward-compatible enum extension — v2 can add values and v1 clients tolerate them.
-
-3. **B.** Default-valued scalars are not emitted in proto3. The tag for `b = 7` is `(2 << 3) | 0 = 16 = 0x10` (one byte) followed by the varint `7` (one byte). Total two bytes. `a = 0` produces zero bytes on the wire.
-
-4. **B.** A method whose response side has `IServerStreamWriter<T>` is server-streaming. The presence of `IServerStreamWriter<T>` on the response side and the absence of `IAsyncStreamReader<T>` on the request side together identify the shape.
-
-5. **B.** `Grpc.Net.Client` has no default deadline. A call with no `deadline:` argument waits forever (or until the HTTP/2 keepalive eventually times out at the transport layer, but that is not a gRPC-level deadline). Always set a deadline on every call; the absence of one is the bug.
-
-6. **B.** `Unauthenticated` is "who are you?" — the caller has not authenticated, or has authenticated with an invalid token. `PermissionDenied` is "you are authenticated as X, but X cannot do this." (C is not a real `StatusCode`; the gRPC analogue of HTTP 401 is `Unauthenticated`.)
-
-7. **B.** Cross-language client generation is the principal value proposition of proto-first. Code-first generates only .NET code and locks you out of every other-language client your team will eventually want.
-
-8. **D.** Deadlines are not millisecond-accurate. They are accurate to whatever resolution the runtime's clock and the cancellation-token plumbing provide — typically 10-50ms in practice. Designing for sub-50ms deadline precision is a mistake.
-
-9. **B.** `AsyncServerStreamingCall<T>` is `IDisposable`. Disposing it (which a `using` declaration does at scope exit) sends `RST_STREAM` and tears the HTTP/2 stream down cleanly. Forgetting the `using` leaks a stream per early-exit — visible in `dotnet-counters monitor Grpc.AspNetCore.Server` as a growing current-streams count.
-
-10. **A.** Interceptors wrap around the handler in registration order. First-registered runs "outermost" — its before-code runs first and its after-code runs last. ASP.NET Core middleware ordering uses the same model.
+</details>
 
 ---
 

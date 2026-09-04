@@ -37,6 +37,14 @@ By the end of this week, you will be able to:
 - **Observe** EF Core through `dotnet-counters monitor Microsoft.EntityFrameworkCore` and read the `total-queries`, `queries-per-second`, and `total-save-changes` counters. Cite <https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/event-counters>.
 - **Cite** Microsoft Learn EF Core documentation, Stephen Toub's `dotnet` performance blog posts, and the `dotnet/efcore` GitHub source for each technique covered.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `CS 61B` — Past the outcome set: no second programming course reads the query its own object graph produced. What transfers is the outcome this week keeps — choose a representation on measured cost, not on the first thing that worked. |
+| Industry | Fix a query that is correct and slow using evidence from the log rather than a guess: split the cartesian query, compile the hot one, and show the numbers before and after. |
+| Beyond the bar | The N+1 problem worked end to end three ways — the log that reveals it, the two different fixes, and the cost each one actually produces — `lecture-notes/02-loading-strategies-and-the-n-plus-one-problem.md` |
+
 ## Prerequisites
 
 - **Week 1 of C9 complete.** You can read and write modern C# — nullable references, file-scoped namespaces, `record` types, pattern matching, `async`/`await`. EF Core depends on every one of these features in idiomatic usage.

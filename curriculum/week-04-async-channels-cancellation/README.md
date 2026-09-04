@@ -23,6 +23,14 @@ By the end of this week, you will be able to:
 - **Recognize** the three flavours of "fire-and-forget" — the wrong one (`async void`), the lazy one (un-awaited `Task`), and the right one (`Task.Run` + an exception observer or a hosted `BackgroundService`).
 - **Reason** about thread-pool starvation, the `SynchronizationContext`, and the difference between `Task.Yield()`, `Task.Delay(0)`, and `await Task.CompletedTask`.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `EECS 280` — Past the outcome set: concurrency belongs to a later course. What transfers is the outcome this week does assess — read what the compiler generated on your behalf and predict the program's behaviour before you run it. |
+| Industry | Build a producer/consumer pipeline that slows down instead of falling over when the consumer cannot keep up, and that shuts down cleanly the moment somebody presses Ctrl-C. |
+| Beyond the bar | The lowered state machine behind an `async` method — the generated struct, the `MoveNext` switch, the awaiter pattern, and where the continuation actually resumes — `lecture-notes/01-tasks-async-await-and-the-state-machine.md` |
+
 ## Prerequisites
 
 - **Weeks 1, 2, and 3** of C9 complete: you can scaffold a multi-project solution from the `dotnet` CLI, write Minimal API endpoints with `TypedResults`, register services with the right lifetime, model an EF Core `DbContext`, and your `dotnet build` reflexively prints `Build succeeded · 0 warnings · 0 errors`.

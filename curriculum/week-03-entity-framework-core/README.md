@@ -23,6 +23,14 @@ By the end of this week, you will be able to:
 - **Choose** between `AsNoTracking()`, projection queries, compiled queries, and `FromSqlInterpolated` based on what the workload actually demands.
 - **Reason** about transactions, optimistic concurrency tokens (`[Timestamp]` / `IsRowVersion()`), and `SaveChangesAsync` behaviour — including what happens when two requests update the same row.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: no second programming course maps an object graph onto relational tables. What does transfer, and is assessed here, is modelling the relationships between types and keeping their invariants true. |
+| Industry | Change a live schema without losing data: generate the migration, read the `Up` and `Down` it produced, and script the diff a deployment pipeline would apply. |
+| Beyond the bar | Reading the SQL your own code emitted, and the three traps that only show up in that log — the N+1 query, the silent client-side evaluation, the unbounded tracked load — `challenges/challenge-01-complex-query-performance.md` |
+
 ## Prerequisites
 
 - **Weeks 1 and 2** of C9 complete: you can scaffold a multi-project solution from the `dotnet` CLI, write Minimal API endpoints with `TypedResults`, register services with the right lifetime, and your `dotnet build` reflexively prints `Build succeeded · 0 warnings · 0 errors`.

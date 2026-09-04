@@ -6,6 +6,60 @@ The Sharp sub-brand (amethyst, `#7C3AED`) is the Microsoft-stack track of the Co
 
 ---
 
+## Standards & equivalency
+
+> C9 stands in for a university's second programming course — the object-oriented one.
+
+**University equivalent.** Programming II / Object-Oriented Programming — `COP 3337`, `CS 106B`, `CS 61B`, `EECS 280`. Coverage: full. The outcome set those sections share — classes and objects, interfaces, deriving and overriding, generics, exceptions, the standard collections and what they cost, unit testing, and one substantial multi-file program the learner designs and defends — is covered here in full, taught in C# 13 on .NET 9. The one thing that does not carry across is Java's own syntax, and that is declared as a gap below.
+
+C9 carries no credit, no transcript entry, no accreditation and no proctored exam. The equivalence is one of **content and skill**: the outcomes an accredited section of that course assesses are assessed here, at the same depth or deeper, with the work visible in a repository. What a registrar records is not something an open repository can give you.
+
+| University outcome | Where this course teaches it | Depth |
+| --- | --- | --- |
+| Define classes and objects, encapsulate state behind behaviour, and reason about where an instance actually lives | [Week 01](curriculum/week-01-csharp-language-tour/) | same |
+| Implement an interface that other code depends on, and derive from a base type to override its members | [Week 03](curriculum/week-03-entity-framework-core/), [Week 06](curriculum/week-06-auth-and-identity/) | same |
+| Model a closed hierarchy of related types and dispatch over every case in it | [Week 05](curriculum/week-05-linq-and-functional/) | deeper |
+| Write and consume generic types and methods, including a generic collection of the learner's own design | [Week 05](curriculum/week-05-linq-and-functional/), [Week 07](curriculum/week-07-performance-benchmarkdotnet-spans/) | deeper |
+| Raise, catch and translate exceptions at a boundary instead of letting the program crash | [Week 02](curriculum/week-02-aspnet-core-minimal-apis/), [Week 04](curriculum/week-04-async-channels-cancellation/), [Week 09](curriculum/week-09-grpc-and-protobuf/) | same |
+| Choose among the standard collections and reason about what each one costs | [Week 05](curriculum/week-05-linq-and-functional/), [Week 07](curriculum/week-07-performance-benchmarkdotnet-spans/) | deeper |
+| Write unit tests for your own code and run them from the command line | [Week 01](curriculum/week-01-csharp-language-tour/), [Week 12](curriculum/week-12-production-grade-service-integration/) | deeper |
+| Build and navigate a multi-file, multi-project program — the solution file, the project file, the dependency graph | [Week 01](curriculum/week-01-csharp-language-tour/), [Week 13](curriculum/week-13-capstone-build/) | deeper |
+| Write code that does more than one thing at a time without deadlocking or corrupting shared state | [Week 04](curriculum/week-04-async-channels-cancellation/), [Week 08](curriculum/week-08-async-channels-in-production/) | deeper |
+| Complete a substantial program of the learner's own design, and defend it | [Week 13](curriculum/week-13-capstone-build/), [Week 14](curriculum/week-14-capstone-harden/), [Week 15](curriculum/week-15-capstone-deploy-present/) | deeper |
+| Write those programs in Java, where a section grades Java syntax | [Week 01](curriculum/week-01-csharp-language-tour/) teaches every one of these constructs in C# 13; no week of C9 uses Java | lighter |
+
+Every row above points at a week that **assigns work** on that outcome — an exercise, a challenge, homework, a quiz item or a mini-project — not a week that merely mentions it.
+
+**The industry bar.** What an employer expects of somebody paid to write C# on .NET, and where this course makes the learner do it.
+
+| What the job expects | Where this course does it |
+| --- | --- |
+| Work lands as commits in a repository, not as files on a desktop | every homework set opens by telling the learner to work in that week's repository so each problem leaves at least one commit — [`curriculum/week-01-csharp-language-tour/homework.md`](curriculum/week-01-csharp-language-tour/homework.md) |
+| The build is clean before you call it done | the zero-warnings promise restated in every week's README, with nullable-reference warnings treated as bugs — [`curriculum/week-01-csharp-language-tour/README.md`](curriculum/week-01-csharp-language-tour/README.md) |
+| You diagnose a fault in a service somebody else wrote and that is mostly correct | [`curriculum/week-08-async-channels-in-production/challenges/challenge-01-diagnose-the-deadlock.md`](curriculum/week-08-async-channels-in-production/challenges/challenge-01-diagnose-the-deadlock.md) and [`curriculum/week-12-production-grade-service-integration/challenges/challenge-02-401-on-the-hub-only.md`](curriculum/week-12-production-grade-service-integration/challenges/challenge-02-401-on-the-hub-only.md) |
+| You measure before you claim something is faster | [`curriculum/week-07-performance-benchmarkdotnet-spans/lecture-notes/01-measuring-performance-with-benchmarkdotnet.md`](curriculum/week-07-performance-benchmarkdotnet-spans/lecture-notes/01-measuring-performance-with-benchmarkdotnet.md) |
+| Tests pass on a machine you cannot log into | [`curriculum/week-13-capstone-build/challenges/challenge-02-green-in-ci-from-clean.md`](curriculum/week-13-capstone-build/challenges/challenge-02-green-in-ci-from-clean.md) |
+| One request stays traceable through every protocol it touches | [`curriculum/week-12-production-grade-service-integration/challenges/challenge-01-cross-protocol-trace.md`](curriculum/week-12-production-grade-service-integration/challenges/challenge-01-cross-protocol-trace.md) |
+| A schema changes without breaking the clients already deployed against it | [`curriculum/week-09-grpc-and-protobuf/challenges/challenge-02-schema-evolution.md`](curriculum/week-09-grpc-and-protobuf/challenges/challenge-02-schema-evolution.md) |
+| The service ships from a pipeline and can be rolled back | [`curriculum/week-15-capstone-deploy-present/lecture-notes/02-github-actions-build-test-publish-deploy.md`](curriculum/week-15-capstone-deploy-present/lecture-notes/02-github-actions-build-test-publish-deploy.md) |
+| Somebody who is not you can operate it in the middle of the night | [`curriculum/week-15-capstone-deploy-present/lecture-notes/03-runbook-on-call-and-the-live-demo.md`](curriculum/week-15-capstone-deploy-present/lecture-notes/03-runbook-on-call-and-the-live-demo.md) |
+
+**Beyond both bars.** Clearing the two floors is entry, not success. Open any of these and check in under a minute.
+
+| What we add | Which bar it beats | Where it lives |
+| --- | --- | --- |
+| The contract is proven across languages, not asserted: a Python client generated from the identical `.proto` calls the C# server on all four gRPC call types | university | [`curriculum/week-09-grpc-and-protobuf/challenges/challenge-01-cross-language-client.md`](curriculum/week-09-grpc-and-protobuf/challenges/challenge-01-cross-language-client.md) |
+| From Week 7 on, every exercise set publishes annotated reference solutions beside the prompts, including the benchmark tables the learner is expected to reproduce | both | [`curriculum/week-07-performance-benchmarkdotnet-spans/exercises/SOLUTIONS.md`](curriculum/week-07-performance-benchmarkdotnet-spans/exercises/SOLUTIONS.md) |
+| A cross-tenant data leak planted in a working codebase, to be proven, closed at the structural layer so it cannot be reintroduced, and pinned by a multi-tenant test | both | [`curriculum/week-14-capstone-harden/challenges/challenge-01-prove-and-close-the-cross-tenant-leak.md`](curriculum/week-14-capstone-harden/challenges/challenge-01-prove-and-close-the-cross-tenant-leak.md) |
+| Green on a cold machine: the integration baseline is deliberately broken three ways on a continuous-integration runner and repaired, so the failures are seen before they ambush anybody | industry | [`curriculum/week-13-capstone-build/challenges/challenge-02-green-in-ci-from-clean.md`](curriculum/week-13-capstone-build/challenges/challenge-02-green-in-ci-from-clean.md) |
+| A latency spike on a dashboard that links straight to the trace that caused it, through an OpenTelemetry exemplar | industry | [`curriculum/week-14-capstone-harden/challenges/challenge-02-exemplar-spike-to-trace.md`](curriculum/week-14-capstone-harden/challenges/challenge-02-exemplar-spike-to-trace.md) |
+| A zero-downtime rollout and a one-command rollback, watched by a load generator counting dropped requests | industry | [`curriculum/week-15-capstone-deploy-present/challenges/challenge-02-zero-downtime-deploy-and-rollback.md`](curriculum/week-15-capstone-deploy-present/challenges/challenge-02-zero-downtime-deploy-and-rollback.md) |
+| Every week ends with a quiz that carries its own answer key in the same file, so nothing is withheld until a deadline | both | [`curriculum/week-01-csharp-language-tour/quiz.md`](curriculum/week-01-csharp-language-tour/quiz.md) |
+
+**Gaps we declare.** Java. Every program in C9 is written in C# 13 on .NET 9, so a section that grades Java syntax — package declarations, checked exceptions, `ArrayList<E>`, `Comparable<T>` — will find none of it here; the concepts transfer, the keystrokes do not. Two smaller limits, stated plainly rather than glossed. First, published worked answers begin at Week 7: the exercise indexes for Weeks 1 to 6 say outright that no solutions are checked in, so those weeks rest on the quiz answer keys and the acceptance criteria in each homework problem instead. Second, C9 does not implement the classical data structures from scratch or analyse their asymptotic cost — that work belongs to [C2 · CrunchTime](https://github.com/CODECRUNCHWORLDWIDE/C2-CrunchTime-The-Code) and C13 · Hack the Interview, and C9 does not claim it.
+
+---
+
 ## Who this is for
 
 **Persona 1 — The Python engineer who needs a second language.**

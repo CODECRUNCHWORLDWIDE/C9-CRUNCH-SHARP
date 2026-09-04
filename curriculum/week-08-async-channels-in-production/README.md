@@ -33,6 +33,14 @@ By the end of this week, you will be able to:
 - **Distinguish** concurrency from parallelism with the Rob Pike formulation and apply it to a concrete .NET pipeline — "this pipeline is concurrent at the channel boundary and parallel only inside `Parallel.ForEachAsync`."
 - **Cite** Microsoft Learn, Stephen Toub's "Parallel Programming with .NET" DevBlogs series, and `dotnet/runtime` source for each technique.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `EECS 280` — Past the outcome set: no second programming course grades a deadlock in a running process. What transfers is the diagnostic habit this week drills — form the hypothesis from the code, then confirm it against what the program actually does. |
+| Industry | Find why a service that compiles and passes its tests hangs under load, and name the mechanism out loud before changing a single line. |
+| Beyond the bar | Four small programs, each carrying exactly one of the canonical async deadlocks, to be predicted from reading, confirmed by running, explained in a paragraph, and then fixed with the smallest change that works — `challenges/challenge-01-diagnose-the-deadlock.md` |
+
 ## Prerequisites
 
 - **Week 4 of C9 complete.** You can write `async Task<T>` methods, propagate `CancellationToken`, and operate the basic `Channel<T>` API for a single-producer single-consumer pipeline. This week is the deepening of all three of those skills; we will not re-derive them.

@@ -22,6 +22,14 @@ By the end of this week, you will be able to:
 - **Inject** services into endpoint handlers via parameters, into typed handler classes via constructors, and into background work via `IServiceScopeFactory`.
 - **Recognize** the three classic DI pitfalls — captive dependencies, scope leakage in singletons, and circular dependencies — and know how to fix each.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: a second programming course constructs its objects by hand in `Main`. This week hands construction to a container and makes the learner choose each object's lifetime with a reason. |
+| Industry | Stand up an HTTP service that returns the right status code and a machine-readable error body, and that documents itself from the same code rather than from a second source of truth. |
+| Beyond the bar | The three dependency-injection failures a container catches at startup and the ones it silently does not — captive dependencies, a scoped service leaked into a singleton, circular registrations — `lecture-notes/02-dependency-injection-and-services.md` |
+
 ## Prerequisites
 
 - **Week 1** of C9 complete: you can scaffold a solution from the `dotnet` CLI, you can read records and pattern matching, and your `dotnet build` reflexively prints zero warnings.

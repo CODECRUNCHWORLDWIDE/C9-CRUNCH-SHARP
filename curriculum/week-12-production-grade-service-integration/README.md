@@ -40,6 +40,14 @@ By the end of this week, you will be able to:
 - **Ship** a Dockerfile and `docker-compose.yml` that runs the service, a PostgreSQL container, and a Jaeger container together. Verify with `curl` and `grpcurl` that the service is healthy.
 - **Cite** the Microsoft Learn ASP.NET Core docs, the Serilog GitHub repository, the OpenTelemetry .NET SDK, the xUnit documentation, the Testcontainers for .NET project, and the `Npgsql.EntityFrameworkCore.PostgreSQL` provider for each technique covered.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Assemble the parts written separately over the term into one serious multi-file program that builds, runs and is tested as a whole. |
+| Industry | Run one deployable that serves three protocol surfaces behind a single authentication scheme, and make one request traceable through all three. |
+| Beyond the bar | Integration tests that stand up the real service against a real database in a container, rather than mocking away the boundary the bugs actually live on — `lecture-notes/03-integration-tests-with-webapplicationfactory-and-testcontainers.md` |
+
 ## Prerequisites
 
 - **Weeks 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 of C9 complete.** This is the integration week; we assume every isolated technology has been seen. Where a concept is reused, we cite the lecture that introduced it rather than re-deriving from scratch.

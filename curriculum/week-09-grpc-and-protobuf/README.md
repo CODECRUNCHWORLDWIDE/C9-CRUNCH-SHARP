@@ -30,6 +30,14 @@ By the end of this week, you will be able to:
 - **Distinguish** code-first gRPC (the `protobuf-net.Grpc` library, where you declare service contracts as C# interfaces and the library generates the schema at runtime) from proto-first gRPC (the mainline approach), and defend the choice — code-first only when you control every client and every client is .NET; proto-first in every other case.
 - **Cite** Microsoft Learn's gRPC chapter, grpc.io's documentation, and the protobuf 3 language guide for each technique.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `EECS 280` — Past the outcome set: a second programming course's types live inside one program. This week makes the type definition itself the shared artefact, and shows what those types look like as bytes on a wire. |
+| Industry | Publish a service contract, generate both sides from it, and evolve it so clients already deployed against version one keep working against version two. |
+| Beyond the bar | A Python client generated from the identical `.proto` file, calling the C# server across all four call types — the wire-format guarantee tested rather than asserted — `challenges/challenge-01-cross-language-client.md` |
+
 ## Prerequisites
 
 - **Week 2 of C9 complete.** You can write an ASP.NET Core minimal API, configure DI, and read an `appsettings.json`. gRPC ASP.NET Core is the same hosting model with a different request-pipeline middleware.

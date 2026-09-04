@@ -28,6 +28,14 @@ By the end of this week, you will be able to:
 - **Profile** a slow LINQ pipeline with BDN, identify the allocations (boxed lambdas, enumerator boxing, intermediate `IEnumerable<T>` allocations), rewrite it as a `for` loop over a `Span<T>` or an `ArrayPool<T>` buffer, and report a 10× or better speedup with numbers.
 - **Cite** the `dotnet/runtime` GitHub issues, Microsoft Learn pages, and Stephen Toub DevBlogs posts that justify each technique.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `CS 61B` — Reason about what a data structure costs, and choose one on evidence rather than habit. |
+| Industry | Prove a change is faster with a benchmark somebody else can reproduce on their own machine, and cut allocation on a hot path without changing what the code does. |
+| Beyond the bar | Designing and benchmarking a collection of your own, `StackList<T>`, against the framework's `List<T>` on the same workload, and defending the result — `challenges/challenge-02-design-and-bench-a-custom-collection.md` |
+
 ## Prerequisites
 
 - **Weeks 1 through 6** of C9 complete: you can scaffold a multi-project solution, write Minimal API endpoints, model an EF Core context, compose `async`/`await`, read a LINQ chain out loud, and wire cookie + JWT auth without surprises. Performance work assumes you are no longer surprised by syntax.

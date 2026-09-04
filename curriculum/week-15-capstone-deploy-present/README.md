@@ -35,6 +35,14 @@ By the end of this week, you will be able to:
 - **Defend** the capstone: run the live demo, package the portfolio, and answer Q&A on contract integrity, test coverage, pipeline quality, and the runbook. Cite the C9 SYLLABUS assessment matrix.
 - **Cite** Microsoft Learn (Azure Container Apps, containerize-a-.NET-app, EF Core migrations, MAUI publish), docs.docker.com, docs.github.com/actions, fly.io/docs, opentelemetry.io, and the `dotnet/dotnet-docker` repository for each technique covered.
 
+## Standards this week meets
+
+| Bar | What this week is measured against |
+| --- | --- |
+| University | `COP 3337` — Past the outcome set: a section collects the final project and closes the term. Nothing in the outcome set asks for a running URL, a rollback, or a defence in front of people who will ask why you built it that way. |
+| Industry | Ship on a push, prove the rollout dropped no requests, roll it back with one command, and hand somebody else a runbook they can follow in the middle of the night. |
+| Beyond the bar | Halving the container image and shipping a Native AOT companion beside it, with cold start and image size measured before and after — `challenges/challenge-01-cut-the-image-and-ship-aot.md` |
+
 ## Prerequisites
 
 - **Weeks 2–14 of C9 complete, and Weeks 13 and 14 in particular.** This week deploys the same `PolyglotWorkshop` repo that Week 13 built and Week 14 hardened. If your Milestone 1 (integration baseline) and Milestone 2 (production polish) are not done, finish them first — there is nothing to deploy otherwise.
